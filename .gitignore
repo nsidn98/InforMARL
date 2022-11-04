@@ -6,6 +6,35 @@ __pycache__/
 # C extensions
 *.so
 
+# custom files
+.vscode/
+.DS_Store
+wandb*
+multiagent/orig_scenarios/
+trained_models/
+models/
+logs/
+out_*
+offpolicy/scripts/results/
+gpg_baseline/results/ 
+attention_baseline/results
+results
+
+# ignoring hanabi and starcraft related files after pushing them to the repo
+onpolicy/results
+onpolicy/scripts/results/
+onpolicy/envs/hanabi/
+onpolicy/envs/starcraft2/
+onpolicy/runner/shared/hanabi_runner_forward.py
+onpolicy/runner/shared/smac_runner.py
+onpolicy/scripts/eval/eval_hanabi.py
+onpolicy/scripts/eval_hanabi_forward.sh
+onpolicy/scripts/train/train_hanabi_forward.py
+onpolicy/scripts/train/train_smac.py
+onpolicy/scripts/train_hanabi_forward.sh
+onpolicy/scripts/train_smac.sh
+
+
 # Distribution / packaging
 .Python
 build/
