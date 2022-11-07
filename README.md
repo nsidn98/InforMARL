@@ -1,7 +1,11 @@
 # InforMARL
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/arXiv-paper-red)](http://arxiv.org/abs/2211.02127)
+[![License: MIT](https://img.shields.io/badge/Project-Website-blue)](https://github.com/nsidn98/InforMARL)
 
-**Code for our paper**: [Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation](https://nsidn98.github.io/files/InforMARL_Arxiv.pdf)
+
+**Code for our paper**: [Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation](http://arxiv.org/abs/2211.02127)
+<!-- **Code for our paper**: [Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation](https://nsidn98.github.io/files/InforMARL_Arxiv.pdf) -->
 
 **Authors**: [Siddharth Nayak](http://nsidn98.github.io/), [Kenneth Choi](https://www.linkedin.com/in/kennethschoi/), [Wenqi Ding](https://github.com/dingwq22), [Sydney Dolan](https://sydneyidolan.com/), [Karthik Gopalakrishnan](https://karthikg.mit.edu/about-me), [Hamsa Balakrishnan](http://www.mit.edu/~hamsa/)
 
