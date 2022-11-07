@@ -159,10 +159,14 @@ If you find the paper or code useful, please cite:
 
 ```bibtex
 @article{nayak22informarl,
-  title     = {Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation},
-  author    = {Siddharth Nayak and Kenneth Choi and Wenqi Ding and Sydney Dolan and Karthik Gopalakrishnan and Hamsa Balakrishna},
-  journal   = {arXiv preprint UPDATE ARXIV LINK},
-  year      = {2022},
+  doi = {10.48550/ARXIV.2211.02127},
+  url = {https://arxiv.org/abs/2211.02127},
+  author = {Nayak, Siddharth and Choi, Kenneth and Ding, Wenqi and Dolan, Sydney and Gopalakrishnan, Karthik and Balakrishnan, Hamsa},
+  keywords = {Multiagent Systems (cs.MA), Artificial Intelligence (cs.AI), Robotics (cs.RO), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  title = {Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation},
+  publisher = {arXiv},
+  year = {2022},
+  copyright = {Creative Commons Attribution 4.0 International}
 }
 ```
 
