@@ -1,8 +1,15 @@
+<div align="center">
+
 # InforMARL
+
+**Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation** 
+
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![License: MIT](https://img.shields.io/badge/arXiv-paper-red)](http://arxiv.org/abs/2211.02127)
+[![License: MIT](https://img.shields.io/badge/arXiv-2211.02127-red)](http://arxiv.org/abs/2211.02127)
 [![License: MIT](https://img.shields.io/badge/Project-Website-blue)](https://github.com/nsidn98/InforMARL)
 
+</div>
 
 **Code for our paper**: [Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation](http://arxiv.org/abs/2211.02127)
 <!-- **Code for our paper**: [Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation](https://nsidn98.github.io/files/InforMARL_Arxiv.pdf) -->
@@ -153,9 +160,13 @@ We compare our methods with other MARL baselines:
     pip install torch-geometric --user
     ```
 
+## Questions/Requests
+
+Please file an issue if you have any questions or requests about the code or the paper. If you prefer your question to be private, you can alternatively email me at sidnayak@mit.edu
+
 ## Citation
 
-If you find the paper or code useful, please cite:
+If you found this codebase useful in your research, please consider citing
 
 ```bibtex
 @article{nayak22informarl,
