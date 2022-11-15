@@ -5,8 +5,9 @@
 **Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation** 
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Documentation](https://img.shields.io/badge/docs-coming_soon-red.svg)](https://github.com/nsidn98/InforMARL)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![License: MIT](https://img.shields.io/badge/arXiv-2211.02127-red)](http://arxiv.org/abs/2211.02127)
+[![License: MIT](https://img.shields.io/badge/arXiv-2211.02127-green)](http://arxiv.org/abs/2211.02127)
 [![License: MIT](https://img.shields.io/badge/Project-Website-blue)](https://github.com/nsidn98/InforMARL)
 
 </div>
@@ -55,6 +56,8 @@ python -u onpolicy/scripts/train_mpe.py --use_valuenorm --use_popart \
 
 ## Graph Neural Network Compatible Navigation Environment:
 We also provide with code for the navigation environment which is compatible to be used with graph neural networks.
+
+**Note**: A more thorough documentation will be up soon.
 
 `python multiagent/custom_scenarios/navigation_graph.py`
 
