@@ -327,7 +327,7 @@
 
                     
                     <br>
-                    <u><b>Environment</b></u>: The agents are depicted by green circles, 
+                    (i) <u><b>Environment</b></u>: The agents are depicted by green circles, 
                     the goals are depicted by red rectangles, and the unknown 
                     obstacles are depicted by gray circles. 
                     <img src="https://latex.codecogs.com/svg.image?x^{(i)}_{\mathrm{agg}}"/> represents the aggregated information from the 
@@ -401,7 +401,8 @@
                             best-performing baselines using global and local information. 
                             InforMARL significantly outperforms most baseline algorithms. 
                             Although RMAPPO has similar performance, it requires global information. 
-                            Appendix \ref{appendix:full_comparison} presents a complete comparison to more baselines. </figcaption>
+                            Refer to Appendix in the <a href="https://arxiv.org/abs/2211.02127">paper</a> 
+                            for a complete comparison to more baselines. </figcaption>
                         </div>
 
                         <br>
@@ -410,7 +411,7 @@
                         <ul>
                             <li> Total reward obtained in an episode by all the agents (higher is better). </li>
                             <li> Fraction of episode taken by the agents to reach the goal, <img src="https://latex.codecogs.com/svg.image?\textbf{T}"/> (lower is better).</li>
-                            <li> The total number of collisions the agents had in the episode, \# col (lower is better).</li>
+                            <li> The total number of collisions the agents had in the episode, # col (lower is better).</li>
                             <li> Percent of episodes in which all agents are able to get to their goals, <img src="https://latex.codecogs.com/svg.image?S\%"/> (higher is better).</li>
                         </ul>
 
@@ -431,9 +432,19 @@
                         <center>
                             <figure>
                                 <image src="img/scale_table.png" class="center" alt="The weight extraction method" height="400"/>
-                                <figcaption><b><br>Table 2</b>: With scheduling density twice as the training dataset, 
-                                    NICE gives a solution in 1.85-1.90 seconds on average whereas Buffer IP fails to 
-                                    produce even a single schedule timing out after 90 minutes.
+                                <figcaption><b><br>Table 2</b>: Test performance of InforMARL, 
+                                when trained on scenarios with 
+                                <img src="https://latex.codecogs.com/svg.image?n"/> 
+                                agents and tested on scenarios with 
+                                <img src="https://latex.codecogs.com/svg.image?m"/> 
+                                agents in the environment. InforMARL is able to achieve a 
+                                success rate of nearly 100% while the fraction 
+                                of episodes taken to reach the goals 
+                                (<img src="https://latex.codecogs.com/svg.image?T"/>) 
+                                is almost constant. Note that we normalize the 
+                                reward and the number of collisions by 
+                                <img src="https://latex.codecogs.com/svg.image?m"/> 
+                                for ease of comparison.
                                 </figcaption>
                             </figure>
                         </center>
@@ -443,9 +454,13 @@
                         <center>
                             <figure>
                                 <image src="img/plots/compare_rad_v2.png" class="center" alt="The weight extraction method" height="400"/>
-                                <figcaption><b><br>Table 2</b>: With scheduling density twice as the training dataset, 
-                                    NICE gives a solution in 1.85-1.90 seconds on average whereas Buffer IP fails to 
-                                    produce even a single schedule timing out after 90 minutes.
+                                <figcaption><b><br>Figure 4</b>: Diminishing 
+                                returns in performance gains from increasing the 
+                                sensing radius for InforMARL. The dashed lines 
+                                are the reward values after saturation for RMAPPO 
+                                in the global (in green) and local (in red) 
+                                information modes, respectively. They are 
+                                provided for reference.
                                 </figcaption>
                             </figure>
                         </center>
@@ -455,9 +470,13 @@
                         <center>
                             <figure>
                                 <image src="img/plots/cent_obs_ablation.png" class="center" alt="The weight extraction method" height="400"/>
-                                <figcaption><b><br>Table 2</b>: With scheduling density twice as the training dataset, 
-                                    NICE gives a solution in 1.85-1.90 seconds on average whereas Buffer IP fails to 
-                                    produce even a single schedule timing out after 90 minutes.
+                                <figcaption><b><br>Figure 5</b>: Training 
+                                performance of InforMARL with, and without, the 
+                                graph information aggregation module, for a 
+                                3-agent scenario. The two variants have similar 
+                                sample complexities. However, the critic network 
+                                with the graph information aggregation module has 
+                                fewer parameters than the one without this module.
                                 </figcaption>
                             </figure>
                         </center>
@@ -631,13 +650,13 @@
                     <ol>
 
                         <li>
-                            Knowledge Distillation by  
-                            <a href="https://arxiv.org/abs/1503.02531">Hinton et al.
-                            (2015)</a>, where the authors show the importance of the knowledge contained 
-                            in the final layer of neural networks.<br />
+                            <a href="https://arxiv.org/abs/2211.03658">Application </a> 
+                            of InforMARL for space traffic management with 
+                            minimum information sharing.
+                            <br />
                         </li>
                         
-                        <li>
+                        <!-- <li>
                             Reinforcement learning based methods for scheduling by <a href="https://dspace.mit.edu/handle/1721.1/145097">Siddharth Nayak
                                 (2022)</a>.<br />
                         </li>
@@ -657,7 +676,7 @@
                         <li>
                             <a href="https://vimeo.com/476994227/cd722a770a"> Talk</a> by Christopher Chin on AI-assisted Optimization 
                             of Schedules.<br />
-                        </li>
+                        </li> -->
                         <br />
                     </ol>
                 </p>
