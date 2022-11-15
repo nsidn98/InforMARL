@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-    <title>NICE</title>
+    <title>InforMARL</title>
 
-    <meta name="description" content="NICE">
+    <meta name="description" content="InforMARL">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!--FACEBOOK-->
@@ -16,19 +16,17 @@
     <!-- <meta property="og:image:width" content="1024"> -->
     <!-- <meta property="og:image:height" content="512"> -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://nsidn98.github.io/NICE/" />
-    <meta property="og:title" content="NICE" />
+    <meta property="og:url" content="https://nsidn98.github.io/InforMARL/" />
+    <meta property="og:title" content="InforMARL" />
     <meta property="og:description"
-        content="Project page for NICE: Robust Scheduling through Reinforcement Learning-Guided Integer
-        Programming." />
+        content="Project page for InforMARL: Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation." />
 
     <!--TWITTER-->
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:site" content="https://nsidn98.github.io/NICE/" />
-    <meta name="twitter:title" content="NICE" />
+    <meta name="twitter:site" content="https://nsidn98.github.io/InforMARL/" />
+    <meta name="twitter:title" content="InforMARL" />
     <meta name="twitter:description"
-        content="Project page for NICE: Robust Scheduling through Reinforcement Learning-Guided Integer
-        Programming." />
+        content="Project page for InforMARL: Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation." />
 
 
 
@@ -61,23 +59,17 @@
     <div class="container" id="main">
         <div class="row">
             <h2 class="col-md-12 text-center">
-                NICE: Robust Scheduling through Reinforcement Learning <br>
-                Guided Integer Programming. </br>
+                InforMARL: Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation. </br>
                 <small>
-                    AAAI 2022
+                    Under Review
                 </small>
             </h2>
 
         </div>
+
         <div class="row">
             <div class="col-md-12 text-center">
                 <ul class="list-inline">
-                    <li>
-                        <a href="https://www.linkedin.com/in/luke-kenworthy-7909b2163/">
-                            Luke Kenworthy
-                        </a>
-                        </br>MIT-Air Force AI Accelerator
-                    </li>
                     <li>
                         <a href="https://nsidn98.github.io">
                             Siddharth Nayak
@@ -85,10 +77,29 @@
                         </br>MIT
                     </li>
                     <li>
-                        <a href="https://www.linkedin.com/in/chris-chin-9702a05b/">
-                            Christopher Chin
+                        <a href="https://www.linkedin.com/in/kennethschoi/">
+                            Kenneth Choi
                         </a>
                         </br>MIT
+                    </li>
+                    <li>
+                        <a href="https://github.com/dingwq22">
+                            Wenqi Ding
+                        </a>
+                        </br>MIT
+                    </li>
+                <!-- </br> -->
+                    <li>
+                        <a href="https://sydneyidolan.com/">
+                            Sydney Dolan
+                        </a>
+                        </br>MIT
+                    </li>
+                    <li>
+                        <a href="https://karthikg.mit.edu/about-me">
+                            Karthik Gopalakrishnan
+                        </a>
+                        </br>Stanford University
                     </li>
                     <li>
                         <a href="https://www.mit.edu/~hamsa/index.html">
@@ -104,21 +115,22 @@
 
 
         <div class="row">
-            <div class="col-md-5 col-md-offset-3 text-center">
+            <!-- <div class="col-md-5 col-md-offset-3 text-center"> -->
+            <div class="col-md-2 col-md-offset-5 text-center">
                 <ul class="nav nav-pills nav-justified">
                     <li>
-                        <a href="https://arxiv.org/abs/2109.12171">
+                        <a href="https://arxiv.org/abs/2211.02127">
                             <image src="img/nice_paper_png.png" height="60px">
                                 <h4><strong>Paper</strong></h4>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/nsidn98/NICE">
+                        <a href="https://github.com/nsidn98/InforMARL">
                             <image src="img/github.png" height="60px">
                                 <h4><strong>Code</strong></h4>
                         </a>
                     </li>
-                    <li>
+                    <!-- <li>
                         <a href="https://www.dropbox.com/s/ng4bwkschxfovz6/NICE%20Slides.pptx?dl=0">
                             <image src="img/ppt.png" height="60px">
                                 <h4><strong>Slides</strong></h4>
@@ -136,7 +148,7 @@
                             <image src="img/poster.png" height="60px">
                                 <h4><strong>Poster</strong></h4>
                         </a>
-                    </li>
+                    </li> -->
 
                 </ul>
             </div>
@@ -150,29 +162,20 @@
                     Abstract
                 </h3>
                     <p class="text-justify">
-                        Integer programs provide a powerful abstraction for representing 
-                        a wide range of real-world scheduling problems. Despite 
-                        their ability to model general scheduling problems, 
-                        solving large-scale integer programs (IP) remains a computational 
-                        challenge in practice. The incorporation of more complex objectives 
-                        such as robustness to disruptions further exacerbates the computational 
-                        challenge. We present <b>NICE</b>  (Neural network IP Coefficient Extraction), 
-                        a novel technique that combines reinforcement learning and 
-                        integer programming to tackle the problem of robust scheduling. 
-                        More specifically, NICE uses reinforcement learning to approximately 
-                        represent complex objectives in an integer programming formulation.  
-                        We use NICE to determine assignments of pilots to a flight 
-                        crew schedule so as to reduce the impact of disruptions. 
-                        We compare NICE with (1) a baseline integer programming 
-                        formulation that produces a feasible crew schedule, and 
-                        (2) a robust integer programming formulation that explicitly 
-                        tries to minimize the impact of disruptions. Our experiments 
-                        show that, across a variety of scenarios, NICE produces 
-                        schedules resulting in 33% to 48% fewer disruptions than 
-                        the baseline formulation. Moreover, in more severely 
-                        constrained scheduling scenarios in which the robust integer 
-                        program fails to produce a schedule within 90 minutes, NICE 
-                        is able to build robust schedules in less than 2 seconds on average.
+                        We consider the problem of multi-agent navigation and 
+                        collision avoidance when observations are limited to the 
+                        local neighborhood of each agent. We propose <b>InforMARL</b>, 
+                        a novel architecture for multi-agent reinforcement learning (MARL) 
+                        which uses local information intelligently to compute paths 
+                        for all the agents in a decentralized manner. Specifically, 
+                        InforMARL aggregates information about the local neighborhood 
+                        of agents for both the actor and the critic using a graph 
+                        neural network and can be used in conjunction with any 
+                        standard MARL algorithm. We show that (1) in training, 
+                        InforMARL has better sample efficiency and performance 
+                        than baseline approaches, despite using less information, 
+                        and (2) in testing, it scales well to environments with 
+                        arbitrary numbers of agents and obstacles.
                         <br>
                     </p>
             </div>
@@ -185,58 +188,120 @@
                 </h3>
                 <!-- <image src="img/fig_1.jpg" class="img-responsive" alt="overview"><br> -->
                     <p class="text-justify">
-                        <u><b>Baseline Integer Programming (IP)</b></u>: these can be easily 
-                        constructed for simpler crew-scheduling problems due to 
-                        the ease in encoding the objectives and constraints. But 
-                        these methods fail when there is uncertainty. Specifically, 
-                        if there are disruptions in the flights, a new solution 
-                        with new assignments has to be created. A simple objective 
-                        function for assigning pilots to flights could be: 
-                        <br> 
-                            <center>
-                                <img src="https://latex.codecogs.com/svg.image?\max&space;\sum\limits_{i\in&space;I}\sum\limits_{s\in&space;S}&space;X_{is}" 
-                                title="\max \sum\limits_{i\in I}\sum\limits_{s\in S} X_{is}" 
-                                class="center" alt="Baseline IP objective"/>
-                            </center>
-                        <br>
-                        where we maximize the number of pilots getting assigned 
+                        MARL-based techniques have achieved significant successes 
+                        in recent times, eg., DeepMind's AlphaStar surpassing 
+                        professional level players in <cite><a href="https://www.nature.com/articles/s41586-019-1724-z">StarCraft II</a></cite>, 
+                        OpenAI Five defeating the world-champion in <cite><a href="https://arxiv.org/abs/1912.06680">Dota II</a></cite>, etc. 
+                        The performance of many of these MARL algorithms depends 
+                        on the amount of information included in the state given 
+                        as input to the neural networks <cite><a href="https://openreview.net/forum?id=YVXaxB6L2Pl">[1]</a></cite>.
+                        In many practical multi-agent scenarios, each agent aims 
+                        to share as little information as possible to accomplish 
+                        the task at hand. This structure naturally arises in many 
+                        multi-agent navigation settings, where agents may have a 
+                        desired end goal but do not want to share their information 
+                        due to communication constraints or proprietary concerns 
+                        <cite><a href="https://ieeexplore.ieee.org/document/7208459">[2], </a></cite>
+                        <cite><a href="https://www.fcc.gov/ecfs/search/search-filings/filing/1040578949828">[3]</a></cite>. 
+                        These scenarios result in a decentralized structure, 
+                        as agents only have locally available information about 
+                        the overall system's state. In this paper, we focus on 
+                        the question: <i><b>"Can we train scalable multi-agent 
+                        reinforcement learning policies that use limited local 
+                        information about the environment to perform collision-free 
+                        navigation effectively?" </b></i>
+
+                        <br><br>
+
+                        
+                        <u><b>A Motivating Experiment</b></u>: 
+                        The amount of information available to each agent determines 
+                        whether or not the agent can learn a meaningful policy.
+                        Although having more information is generally correlated 
+                        to better performance, it does not necessarily scale well 
+                        with the number of agents. Prior works like MAPPO <cite><a href="https://openreview.net/forum?id=YVXaxB6L2Pl">[1] </a></cite>, MADDPG
+                        <cite><a href="https://arxiv.org/abs/1706.02275">[4] </a></cite>
+                        have typically used a na&iumlve concatenation of the states 
+                        of all agents or entities in the environment fed into a 
+                        neural network. Such an approach scales poorly 
+                        (the network input size is determined by the number of agents) 
+                        and does not transfer well to scenarios with a different 
+                        number of agents than the training environment. We illustrate 
+                        the dependence of the learned policies on the amount of 
+                        information available to agents by defining three information modes: 
+                          <ul>
+                            <li>
+                                <b>Local</b>: In the local information mode, 
+                                <img src="https://latex.codecogs.com/svg.image?o^{(i)}_{\mathrm{loc}}&space;=&space;[p^{(i)},&space;v^{(i)},&space;p^{(i)}_{\mathrm{goal}}]"/>
+                                where <img src="https://latex.codecogs.com/svg.image?p^{(i)}"/> 
+                                and <img src="https://latex.codecogs.com/svg.image?v^{(i)}"/> 
+                                are the position and velocity of agent 
+                                <img src="https://latex.codecogs.com/svg.image?{i}"/> 
+                                in a global frame, and <img src="https://latex.codecogs.com/svg.image?p^{(i)}_{\mathrm{goal}}"/> 
+                                is the position of the goal relative to the agent's position.
+                            </li>
+                            <li>
+                                <b>Global</b>: Here, 
+                                <img src="https://latex.codecogs.com/svg.image?o_{\mathrm{glob}}^{(i)}&space;=&space;[p^{(i)},&space;v^{(i)},&space;p^{(i)}_{\mathrm{goal}},&space;p^{(i)}_{\mathrm{other}}]" />
+                                where <img src="https://latex.codecogs.com/svg.image?p^{(i)}_{\mathrm{other}}"/> 
+                                comprises of the relative positions of all 
+                                the other entities in the environment. The 
+                                scenarios defined in the MAPE 
+                                (and consequently, other approaches that use MAPE) 
+                                use this type of information mode unless explicitly stated otherwise.
+                            </li>
+                            <li>
+                                <b>Neighbourhood</b>: In this information mode, 
+                                agent <img src="https://latex.codecogs.com/svg.image?{i}"/> 
+                                observes <img src="https://latex.codecogs.com/svg.image?o_{\mathrm{nbd}}^{(i)}&space;=&space;[p^{(i)},&space;v^{(i)},&space;p^{(i)}_{\mathrm{goal}},&space;p^{(i)}_{\mathrm{other}}]"/>
+                                where <img src="https://latex.codecogs.com/svg.image?p^{(i)}_{other}"/> 
+                                comprises of the relative positions of all other 
+                                entities which are within a distance <i>nbd-dist</i> 
+                                of the agent. The maximum number of entities 
+                                within the neighborhood is denoted <i>max-nbd-entities</i>, 
+                                and so the dimension of the observation vector is fixed. 
+                                If there are fewer than <i>max-nbd-entities</i> 
+                                within a distance <i>nbd-dist</i> of the agent, 
+                                we pad this vector with zeros.
+                            </li>
+                          </ul>
+                        <!-- where we maximize the number of pilots getting assigned 
                         to slots in flights. Here 𝐼 is the set of pilots, 𝑆 is 
-                        the set of slots in flights.
+                        the set of slots in flights. -->
                         <br>
                         <br>
 
-                        <u><b>Robust Buffer Formulation</b></u>: one can use a 
-                        more sophisticated IP formulation to account for these 
-                        disruptions. To alleviate the effect of disruptions, one 
-                        could try to maximize the buffers between successive flights 
-                        the pilots get assigned to so that any overflow caused due 
-                        to delays in flights will have some buffer time. Here, 
-                        one could use an objective function like: 
-                        <br> 
-                            <center>
-                                <img src="https://latex.codecogs.com/svg.image?\max&space;\sum\limits_{i\in&space;I}\sum\limits_{f,f'\in&space;F\times&space;F}&space;b_{iff'}B_{iff'}" 
-                                title="\max \sum\limits_{i\in I}\sum\limits_{f,f'\in F\times F} b_{iff'}B_{iff'}" 
-                                class="center" alt="Robust buffer IP objective"/>
-                            </center>
-                        <br>
-                        where the objective function is penalizes for having 
-                        smaller buffers. But as the problem becomes more complex, 
-                        the time required to get the solution increases and quickly 
-                        becomes intractable. Here 𝐹 is the set of flights, 𝑏_(𝑖𝑓𝑓^′ )  
-                        is the buffer penalty.
-                        <br>
-                        <br>
+                        <center>
+                            <figure>
+                                <image src="img/plots/local_nbd_global.png" class="center" alt="The MDP for RL agent" height="340"/>
+                                <figcaption><b><br>Fig 1:</b> RMAPPO with the 
+                                    local, neighborhood (with 1, 3, and 5 
+                                    <i>max-nbd-entities</i>), and global 
+                                    information given as states. The plots show 
+                                    the rewards during training for the 3 agent-3 
+                                    obstacle navigation scenario. The means and 
+                                    standard deviations of the rewards over training 
+                                    with five random seeds are shown. Comparing the 
+                                    global information mode to the others, we see 
+                                    that merely providing local information and 
+                                    a na&iumlve concatenation of neighborhood 
+                                    information is not sufficient to learn an 
+                                    optimal policy. </figcaption>
+                            </figure>
+                        </center>
 
-                        <u><b>Reinforcement Learning (RL)</b></u>: Another 
-                        possible solution would be to use RL to create schedules 
-                        where the flights are shown sequentially in chronological 
-                        order and the agent has to choose pilots. Here, the agent 
-                        can be rewarded according to whatever objective function 
-                        we want to optimize. Although, this works well, the IP 
-                        methods perform better to give a solution in a reasonable 
-                        amount of time. 
+
                         <br>
                         <br>
+                        <center>
+                            <figure>
+                                <image src="img/less_info.png" class="center" alt="The MDP for RL agent" height="340"/>
+                                <figcaption><b><br>Fig </b> The title of our paper in an alternate universe where academic papers can be informa(r)l </figcaption>
+                            </figure>
+                        </center>
+
+                        <!-- <br>
+                        <br> -->
 
                     </p>
             </div>
@@ -248,132 +313,148 @@
                     Method
                 </h3>
                 <p class="text-justify">
-                    <u><b>Knowledge Distillation</b></u>: <a href="https://arxiv.org/abs/1503.02531">Hinton et al.
-                        (2015)</a> show 
-                    that the probabilities in a neural network’s output layer 
-                    carries useful information even if only the maximum probability 
-                    value is used for downstream tasks like classification. Instead 
-                    of letting the RL agent take actions in the environment, 
-                    we use the probability distribution over the choice of pilots 
-                    to guide the IP.
+                        This is where our MARL framework for navigation - <i>InforMARL</i> comes into the picture. InforMARL, consists 
+                        of four modules, as shown in Figure 1. We describe each in detail below:
                     <br>
 
 
                     <center>
                         <figure>
-                            <image src="img/rl_mdp.png" class="center" alt="The MDP for RL agent" height="340"/>
-                            <figcaption><b><br>Fig 1:</b> A rough MDP for the RL agent. The RL agent gives a probability 
-                            distribution over the pilots which is used by NICE to boost the integer programming formulation.</figcaption>
+                            <image src="img/graphMARLArch.v8.png" class="center" alt="The MDP for RL agent" height="340"/>
+                            <figcaption><b><br>Figure 1:</b> Overview of our method - <i>InforMARL</i> </figcaption>
                         </figure>
                     </center>
 
+                    
                     <br>
-                    The objective function is modified to:
+                    <u><b>Environment</b></u>: The agents are depicted by green circles, 
+                    the goals are depicted by red rectangles, and the unknown 
+                    obstacles are depicted by gray circles. 
+                    <img src="https://latex.codecogs.com/svg.image?x^{(i)}_{\mathrm{agg}}"/> represents the aggregated information from the 
+                    neighborhood, which is the output of a graph neural network. A graph is created 
+                    by connecting entities within the sensing-radius of the agents. 
                     <br>
-                    <br> 
-                            <center>
-                                <img src="https://latex.codecogs.com/svg.image?\max&space;\sum\limits_{i\in&space;I}\sum\limits_{s\in&space;S}&space;a_{is}X_{is}" 
-                                title="\max \sum\limits_{i\in I}\sum\limits_{s\in S} a_{is}X_{is}" 
-                                class="center" alt="Modified NICE IP objective"/>
-                            </center>
                     <br>
-                    where 𝑎_𝑖𝑠 are the probabilities for assigning pilot 𝑖 to slot 𝑠. 
-                    The probability values are obtained from the final layer of the RL agent’s network.
+                    (ii)  <u><b>Information Aggregation</b></u>: Each agent's observation 
+                    <img src="https://latex.codecogs.com/svg.image?o^{(i)}"/> is 
+                    concatenated with <img src="https://latex.codecogs.com/svg.image?x^{(i)}_{\mathrm{agg}}"/>. 
+                    The inter-agent edges are bidirectional, while the edges 
+                    between agents and non-agent entities are unidirectional. 
+                    <br>
+                    <br>
+                    (iii) <u><b>Graph Information Aggregation</b></u>: The aggregated vector 
+                    from all the agents is averaged to get <img src="https://latex.codecogs.com/svg.image?X_{\mathrm{agg}}"/>.
+                    <br>
+                    <br>
+                    (iv) <u><b>Actor-Critic</b></u>: The concatenated vector 
+                    <img src="https://latex.codecogs.com/svg.image?[o^{(i)}, x^{(i)}_{\mathrm{agg}}]"/> 
+                    is fed into the actor network to get the action, and 
+                    <img src="https://latex.codecogs.com/svg.image?X_{\mathrm{agg}}"/>
+                    is fed into the critic network to get the state-action values.
                     
                     <br>
                     <br>
                     <br>
-
-                    <u><b>Probability Weight Extraction</b></u>: Two different 
-                    methods are used to extract the weights from the RL agent
-                    <br>
-                    
-                    <ol>
-                        <li>
-                            <u><b>Blank State Method</b></u>: This approach exploits the 
-                            fact that the probability weights for the pilots produced by 
-                            the first slot do not depend on any previous actions taken. 
-                            Here, each slot is treated as the first scheduled slot. To 
-                            do so, for each slot in the fixed order a new RL agent with 
-                            the same underlying neural network is initialized cutting out 
-                            all the states that occur before extracting the probability 
-                            values 𝑎_𝑖𝑠
-                            <br>
-                        </li>
-                    
-                        <li>
-                            <u><b>Monte Carlo Method</b></u>: The scheduler is run 𝑛 times, 
-                            shuffling the order of slots each time. Then, the probability 
-                            values from the output layer are averaged across the 𝑛 runs. 
-                            These coefficients are then passed to the IP solver to obtain 
-                            the NICE-generated schedule.
-                        </li>
-                    </ol>
-                    <br>
-                    <br>
-
-
-                <!-- <figure>
-                    <image src="img/fig_2.jpg" class="img-responsive" onmouseover="this.src='img/fig_2_hover.jpg'"
-                        onmouseout="this.src='img/fig_2.jpg'" alt="" />
-                    <figcaption><b><br>Method overview.</b> Hover mouse pointer to see details.</figcaption>
-                </figure> -->
-                <center>
-                    <figure>
-                        <image src="img/extract-labeled.png" class="center" alt="The weight extraction method" height="450"/>
-                        <figcaption><b><br>Fig 2:</b> The Monte Carlo weight extraction method. Once we train our network, 
-                            we run the scheduler n times, shuffling the order of slots each time. We then average the 
-                            probability values in the output layer across the n runs over pilots and slots to obtain
-                            our NICE coefficients. Finally, we pass these coefficients to the IP solver to obtain our 
-                            NICE-generated schedule.</figcaption>
-                    </figure>
-                </center>
-                
-                <br>
-                <br>
-
-                <center>
-                    <figure>
-                        <image src="img/NICE_psuedocode.png" class="center" alt="A rough pseudocode" height="600"/>
-                        <!-- <figcaption><b><br>Pseudocode for NICE.</b></figcaption> -->
-                    </figure>
-                </center>
 
             </div>
         </div>
-
 
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <h3>
                     Experiments and Results
                 </h3>
-                <!-- <image src="img/fig_1.jpg" class="img-responsive" alt="overview"><br> -->
                     <p class="text-justify">
-                        We perform the experiments as follows:
+                        <u><b>Comparisons against other methods</b></u>:
+                        We compare our method with a few different MARL baselines 
+                        in the navigation environment. 
+                        <!-- We compare the following algorithms:
                         <ul>
-                            <li> Generate one week's worth of flights </li>
-                            <li> Schedule with baseline IP, RL scheduler, buffer IP and NICE</li>
-                            <li> One day into the schedule delay f% of the flights that had not already left</li>
-                            <li> Fix delays with disruption minimizing IP</li>
-                            <li> Count the disruptions with each scheduling method</li>
+                            <li>"Multi-Agent Proximal Policy Optimization" (MAPPO)</li>
+                            <li>"Multi-Agent Deep Deterministic Policy Gradient" (MADDPG)</li>
+                            <li>"Multi-Agent Twin Delayed Deep Deterministic Policy Gradient" (MATD3)</li>
+                            <li>"Multi-Agent Value Decomposition Networks" (VDN)</li>
+                            <li>"Multi-Agent Value Function Factorisation using mixer networks" (QMIX)</li>
+                            <li>"Graph Policy Gradient" (GPG)</li>
+                            <li>"Graph Convolutional Reinformement Learning" (DNG)</li>
+                            <li>"Entity Graph Message Passing Networks" (EMP)</li>
+                        </ul> -->
+                        <br>
+
+                        <div class="row">
+                            <div class="column">
+                                <img src="img/plots/compare_3_short.png" style="float: left; width: 33%; margin-right: 0%; margin-bottom: 0.5em;">
+                                <!-- <img src="img/plots/compare_3_short.png" alt="Snow" style="width:30%"> -->
+                            </div>
+                            <div class="column">
+                                <img src="img/plots/compare_7_short.png" style="float: left; width: 33%; margin-right: 0%; margin-bottom: 0.5em;">
+                                <!-- <img src="img/plots/compare_3_short.png" alt="Forest" style="width:30%"> -->
+                            </div>
+                            <div class="column">
+                                <img src="img/plots/compare_10_short.png" alt="Mountains" style="width:33%">
+                            </div>
+                            <div class="column">
+                                <img src="img/plots/legend_3_short_transpose.png" alt="Mountains" style="width:100%">
+                            </div>
+                            <figcaption><b><br>Figure 2</b>: Comparison of the 
+                            training performance of InforMARL with the 
+                            best-performing baselines using global and local information. 
+                            InforMARL significantly outperforms most baseline algorithms. 
+                            Although RMAPPO has similar performance, it requires global information. 
+                            Appendix \ref{appendix:full_comparison} presents a complete comparison to more baselines. </figcaption>
+                        </div>
+
+                        <br>
+                        <br>
+                        The following metrics are compared:
+                        <ul>
+                            <li> Total reward obtained in an episode by all the agents (higher is better). </li>
+                            <li> Fraction of episode taken by the agents to reach the goal, <img src="https://latex.codecogs.com/svg.image?\textbf{T}"/> (lower is better).</li>
+                            <li> The total number of collisions the agents had in the episode, \# col (lower is better).</li>
+                            <li> Percent of episodes in which all agents are able to get to their goals, <img src="https://latex.codecogs.com/svg.image?S\%"/> (higher is better).</li>
                         </ul>
+
+                        The best-performing methods that use global information (RMAPPO) and local information (InforMARL) are highlighted.
+
+                        <figure>
+                            <image src="img/compare_table.png" class="left" alt="Comparison Table" height="400" align="left"/>
+                            <figcaption><b><br>Table 1</b>: Comparison of InforMARL 
+                            with other baseline methods, for scenarios with 3, 7, and 10 
+                            agents in the environment. The results presented 
+                            represent the average of 100 test episodes.  </figcaption>
+                        </figure>
 
                         <br>
 
+                        <u><b>Scalability of InforMARL</b></u>:
+
                         <center>
                             <figure>
-                                <image src="img/res1.png" class="center" alt="The weight extraction method" height="200"/>
-                                <figcaption><b><br>Table 1</b>: With scheduling density same as the training dataset, 
-                                    both NICE and Buffer IP take &#60 0.85 seconds on average. </figcaption>
+                                <image src="img/scale_table.png" class="center" alt="The weight extraction method" height="400"/>
+                                <figcaption><b><br>Table 2</b>: With scheduling density twice as the training dataset, 
+                                    NICE gives a solution in 1.85-1.90 seconds on average whereas Buffer IP fails to 
+                                    produce even a single schedule timing out after 90 minutes.
+                                </figcaption>
                             </figure>
                         </center>
 
-                        <br>
+                        <u><b>Effect of sensing radius</b></u>:
 
                         <center>
                             <figure>
-                                <image src="img/res2.png" class="center" alt="The weight extraction method" height="200"/>
+                                <image src="img/plots/compare_rad_v2.png" class="center" alt="The weight extraction method" height="400"/>
+                                <figcaption><b><br>Table 2</b>: With scheduling density twice as the training dataset, 
+                                    NICE gives a solution in 1.85-1.90 seconds on average whereas Buffer IP fails to 
+                                    produce even a single schedule timing out after 90 minutes.
+                                </figcaption>
+                            </figure>
+                        </center>
+
+                        <u><b>Ablation study for Graph Information Aggregation Module</b></u>:
+
+                        <center>
+                            <figure>
+                                <image src="img/plots/cent_obs_ablation.png" class="center" alt="The weight extraction method" height="400"/>
                                 <figcaption><b><br>Table 2</b>: With scheduling density twice as the training dataset, 
                                     NICE gives a solution in 1.85-1.90 seconds on average whereas Buffer IP fails to 
                                     produce even a single schedule timing out after 90 minutes.
@@ -393,23 +474,27 @@
                     <p class="text-justify">
                         <ul>
                             <li> 
-                                NICE uses reinforcement learning to approximate 
-                                and simplify computationally difficult integer 
-                                programming problems. It leverages the knowledge 
-                                learned by the RL agent along with utilizing the 
-                                global outlook of the integer programming.
+                                We showed that having just local observations as 
+                                states is not enough for standard MARL algorithms 
+                                to learn meaningful policies. 
                             </li>
 
                             <li> 
-                                NICE is able to produce schedules significantly 
-                                better than the ones obtained by baseline integer 
-                                programming formulations
+                                Along with this, we also showed that 
+                                albeit na&iumlvely concatenating state information 
+                                about all the entities in the environment helps 
+                                to learn good policies, they are not transferable 
+                                to other scenarios with a different number of 
+                                entities than what it was trained on.
                             </li>
 
                             <li> 
-                                NICE is highly generalizable and can be used 
-                                whenever there is an isomorphism between an 
-                                integer program and a reinforcement learning solution
+                                InforMARL is able to learn transferable policies 
+                                using standard MARL algorithms using just local 
+                                observations and an aggregated neighborhood 
+                                information vector. Furthermore, it has better 
+                                sample complexity than other standard MARL 
+                                algorithms that use global observation.
                             </li>
                         </ul>
                         <br>
@@ -420,23 +505,51 @@
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <h3>
-                    Video at AAAI 2022
+                    Future Work
+                </h3>
+                    <p class="text-justify">
+                        <ul>
+                            <li> 
+                                Include the introduction of more complex 
+                                (potentially adversarial) dynamic obstacles in 
+                                the environment.
+                            </li>
+
+                            <li> 
+                                Adding a safety guarantee layer for the actions 
+                                of the agents to avoid collisions at all costs.
+                            </li>
+
+                            <li> 
+                                Investigate the use of InforMARL for curriculum 
+                                learning and transfer learning to more complex environments.
+                            </li>
+                        </ul>
+                        <br>
+                    </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Video Presentation (Coming Soon)
                 </h3>
 
                 <br>
                 <p align="center">
                 <div class="embed-responsive embed-responsive-16by9">
                     <!-- width="500" height="281" -->
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/ooj9E-endGc" 
-                    title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen></iframe>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                    title="YouTube video player" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <!--                     https://www.youtube.com/watch?v=dQw4w9WgXcQ -->
                 </div>
 
                 </p>
 
-                <br> Presented at the AAAI 2022 <a href="https://aaai.org/Conferences/AAAI-22/">Main track</a>.
-                <br>
+                <!-- <br> Presented at the Conference <a href="https://conference-website/">Main track</a>. -->
+                <!-- <br>
                 <table align=center width=800px>
                     <br>
                     <tr>
@@ -448,7 +561,7 @@
 
                 <object width="800" height="500" type="application/pdf" data="img/nice_slides.pdf?#zoom=60&scrollbar=0&toolbar=0&navpanes=0">
                     <p>Insert your error message here, if the PDF cannot be displayed.</p>
-                </object>
+                </object> -->
 
             </div>
         </div>
@@ -460,42 +573,43 @@
                 <h3>
                     Citation
                 </h3>
-                <br />If you find our code or datasets useful in your research, please cite the following:
+                <br />If you find our work or code useful in your research, please consider citing the following:
                 <br />
                 <br />
                 <div class="form-group col-md-12 col-md-offset-0">
                     <textarea id="bibtex" class="form-control" rows="13" readonly>
-@article{DBLP:journals/corr/abs-2109-12171,
-    author    = {Luke Kenworthy and Siddharth Nayak and Christopher Chin and Hamsa Balakrishnan},
-    title     = {{NICE:} Robust Scheduling through Reinforcement Learning-Guided Integer Programming},
-    journal   = {CoRR},
-    volume    = {abs/2109.12171},
-    year      = {2021},
-    url       = {https://arxiv.org/abs/2109.12171},
-    eprinttype = {arXiv},
-    eprint    = {2109.12171},
-    timestamp = {Mon, 04 Oct 2021 17:22:25 +0200},
-    biburl    = {https://dblp.org/rec/journals/corr/abs-2109-12171.bib},
-    bibsource = {dblp computer science bibliography, https://dblp.org}
+@article{nayak22informarl,
+    doi = {10.48550/ARXIV.2211.02127},
+    url = {https://arxiv.org/abs/2211.02127},
+    author = {Nayak, Siddharth and Choi, Kenneth and Ding, Wenqi and Dolan, Sydney and Gopalakrishnan, Karthik and Balakrishnan, Hamsa},
+    keywords = {Multiagent Systems (cs.MA), Artificial Intelligence (cs.AI), Robotics (cs.RO), FOS: Computer and information sciences, FOS: Computer and information sciences},
+    title = {Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation},
+    publisher = {arXiv},
+    year = {2022},
+    copyright = {Creative Commons Attribution 4.0 International}
     }                        
                     </textarea>
                 </div>
-                <br />
-                <br />
+                <!-- <br /> -->
+                <!-- <br /> -->
                 <br />
                 <div class="form-group col-md-12 col-md-offset-0">
-                    <textarea id="bibtex" class="form-control" rows="6" readonly>
-@mastersthesis{Chin2021,
-    author  = "Christopher Ho-Yen Chin",
-    title   = "Disruptions and Robustness in Air Force Crew Scheduling",
-    school  = "MIT",
-    year    = "2021"
-    }
+                    <textarea id="bibtex" class="form-control" rows="12" readonly>
+@misc{https://doi.org/10.48550/arxiv.2211.03658,
+    doi = {10.48550/ARXIV.2211.03658},
+    url = {https://arxiv.org/abs/2211.03658},
+    author = {Dolan, Sydney and Nayak, Siddharth and Balakrishnan, Hamsa},
+    keywords = {Multiagent Systems (cs.MA), FOS: Computer and information sciences, FOS: Computer and information sciences},
+    title = {Transfer Learning for Space Traffic Management},
+    publisher = {arXiv},
+    year = {2022},
+    copyright = {Creative Commons Attribution 4.0 International}
+    }                          
                     </textarea>
                 </div>
                 <br />
                 <br />
-                <div class="form-group col-md-12 col-md-offset-0">
+                <!-- <div class="form-group col-md-12 col-md-offset-0">
                     <textarea id="bibtex" class="form-control" rows="6" readonly>
 @mastersthesis{Nayak2022,
     author  = "Siddharth Nagar Nayak",
@@ -504,7 +618,7 @@
     year    = "2022"
     }
                     </textarea>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -556,16 +670,26 @@
                     Acknowledgements
                 </h3>
                 <p class="text-justify">
-                    <br />This research was sponsored by the United
-                    States Air Force Research Laboratory and was accomplished
-                    under Cooperative Agreement Number FA8750-19-2-1000.
-                    The views and conclusions contained in this document are
+                    <br />The authors would like to thank the 
+                    <a href="https://supercloud.mit.edu/">MIT SuperCloud</a> 
+                    and the Lincoln Laboratory Supercomputing Center for providing 
+                    high performance computing resources that have contributed to 
+                    the research results reported within this paper. 
+                    The NASA University Leadership initiative (grant #80NSSC20M0163) 
+                    provided funds to assist the authors with their research, 
+                    but this article solely reflects the opinions and conclusions 
+                    of its authors and not any NASA entity. This research was 
+                    sponsored in part by the United States AFRL and the United 
+                    States Air Force Artificial Intelligence Accelerator and was 
+                    accomplished under Cooperative Agreement Number FA8750-19-2-1000. 
+                    The views and conclusions contained in this document are 
                     those of the authors and should not be interpreted as 
-                    representing the official policies, either expressed or implied,
-                    of the United States Air Force or the U.S. Government.
+                    representing the official policies, either expressed or implied, 
+                    of the United States Air Force or the U.S. Government. 
                     The U.S. Government is authorized to reproduce and distribute 
-                    reprints for Government purposes notwithstanding
-                    any copyright notion herein.
+                    reprints for Government purposes notwithstanding any copyright 
+                    notion herein. Sydney Dolan was supported by the National 
+                    Science Foundation Graduate Research Fellowship under Grant No. 1650114.
                     <br />
                     <br /> This website template was borrowed from <a href="http://mgharbi.com/">Michaël Gharbi</a> and
                     <a href="https://www.matthewtancik.com">Matthew Tannick</a>.
