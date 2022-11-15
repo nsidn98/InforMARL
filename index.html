@@ -58,12 +58,12 @@
 <body>
     <div class="container" id="main">
         <div class="row">
-            <h2 class="col-md-12 text-center">
+            <h1 class="col-md-12 text-center">
                 InforMARL: Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation. </br>
                 <small>
                     Under Review
                 </small>
-            </h2>
+            </h1>
 
         </div>
 
@@ -213,8 +213,9 @@
 
                         <br><br>
 
-                        
-                        <u><b>A Motivating Experiment</b></u>: 
+                        <h4>
+                            A Motivating Experiment
+                        </h4>
                         The amount of information available to each agent determines 
                         whether or not the agent can learn a meaningful policy.
                         Although having more information is generally correlated 
@@ -274,7 +275,7 @@
                         <center>
                             <figure>
                                 <image src="img/plots/local_nbd_global.png" class="center" alt="The MDP for RL agent" height="340"/>
-                                <figcaption><b><br>Fig 1:</b> RMAPPO with the 
+                                <figcaption><b><br>Fig 1:</b> MAPPO with the 
                                     local, neighborhood (with 1, 3, and 5 
                                     <i>max-nbd-entities</i>), and global 
                                     information given as states. The plots show 
@@ -365,7 +366,9 @@
                     Experiments and Results
                 </h3>
                     <p class="text-justify">
-                        <u><b>Comparisons against other methods</b></u>:
+                        <h4>
+                            Comparisons against other methods
+                        </h4>
                         We compare our method with a few different MARL baselines 
                         in the navigation environment. 
                         <!-- We compare the following algorithms:
@@ -418,7 +421,7 @@
                         The best-performing methods that use global information (RMAPPO) and local information (InforMARL) are highlighted.
 
                         <figure>
-                            <image src="img/compare_table.png" class="left" alt="Comparison Table" height="400" align="left"/>
+                            <image src="img/compare_table.png" class="noPadding" alt="Comparison Table" height="350"/>
                             <figcaption><b><br>Table 1</b>: Comparison of InforMARL 
                             with other baseline methods, for scenarios with 3, 7, and 10 
                             agents in the environment. The results presented 
@@ -427,11 +430,13 @@
 
                         <br>
 
-                        <u><b>Scalability of InforMARL</b></u>:
+                        <h4>
+                            Scalability of InforMARL
+                        </h4>
 
                         <center>
                             <figure>
-                                <image src="img/scale_table.png" class="center" alt="The weight extraction method" height="400"/>
+                                <image src="img/scale_table.png" class="center" alt="The weight extraction method" height="350"/>
                                 <figcaption><b><br>Table 2</b>: Test performance of InforMARL, 
                                 when trained on scenarios with 
                                 <img src="https://latex.codecogs.com/svg.image?n"/> 
@@ -448,8 +453,10 @@
                                 </figcaption>
                             </figure>
                         </center>
-
-                        <u><b>Effect of sensing radius</b></u>:
+                        
+                        <h4>
+                            Effect of sensing radius
+                        </h4>
 
                         <center>
                             <figure>
@@ -465,7 +472,9 @@
                             </figure>
                         </center>
 
-                        <u><b>Ablation study for Graph Information Aggregation Module</b></u>:
+                        <h4>
+                            Ablation study for Graph Information Aggregation Module
+                        </h4>
 
                         <center>
                             <figure>
@@ -544,12 +553,12 @@
                                 learning and transfer learning to more complex environments.
                             </li>
                         </ul>
-                        <br>
+                        <!-- <br> -->
                     </p>
             </div>
         </div>
 
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <h3>
                     Video Presentation (Coming Soon)
@@ -558,17 +567,15 @@
                 <br>
                 <p align="center">
                 <div class="embed-responsive embed-responsive-16by9">
-                    <!-- width="500" height="281" -->
                     <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
                     title="YouTube video player" frameborder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<!--                     https://www.youtube.com/watch?v=dQw4w9WgXcQ -->
                 </div>
 
                 </p>
 
-                <!-- <br> Presented at the Conference <a href="https://conference-website/">Main track</a>. -->
-                <!-- <br>
+                <br> Presented at the Conference <a href="https://conference-website/">Main track</a>.
+                <br>
                 <table align=center width=800px>
                     <br>
                     <tr>
@@ -580,18 +587,16 @@
 
                 <object width="800" height="500" type="application/pdf" data="img/nice_slides.pdf?#zoom=60&scrollbar=0&toolbar=0&navpanes=0">
                     <p>Insert your error message here, if the PDF cannot be displayed.</p>
-                </object> -->
+                </object>
 
             </div>
-        </div>
-
-
+        </div> -->
 
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
-                <h3>
+                <h2>
                     Citation
-                </h3>
+                </h2>
                 <br />If you find our work or code useful in your research, please consider citing the following:
                 <br />
                 <br />
@@ -647,7 +652,7 @@
                     Related Links
                 </h3>
                 <p class="text-justify">
-                    <ol>
+                    <ul>
 
                         <li>
                             <a href="https://arxiv.org/abs/2211.03658">Application </a> 
@@ -678,7 +683,7 @@
                             of Schedules.<br />
                         </li> -->
                         <br />
-                    </ol>
+                    </ul>
                 </p>
             </div>
         </div>
