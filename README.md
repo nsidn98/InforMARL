@@ -8,7 +8,7 @@
 [![Documentation](https://img.shields.io/badge/docs-coming_soon-red.svg)](https://github.com/nsidn98/InforMARL)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![License: MIT](https://img.shields.io/badge/arXiv-2211.02127-green)](http://arxiv.org/abs/2211.02127)
-[![License: MIT](https://img.shields.io/badge/Project-Website-blue)](https://github.com/nsidn98/InforMARL)
+[![License: MIT](https://img.shields.io/badge/Project-Website-blue)](https://nsidn98.github.io/InforMARL/)
 
 </div>
 
