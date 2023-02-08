@@ -173,9 +173,28 @@
                         neural network and can be used in conjunction with any 
                         standard MARL algorithm. We show that (1) in training, 
                         InforMARL has better sample efficiency and performance 
+                        than baseline approaches, despite using less information,
+                        and (2) in testing, it scales well to environments
+                        with arbitrary numbers of agents and obstacles.
+                        We illustrate these results using four task environments, 
+                        including one with predetermined goals
+                        for each agent, and one in which the agents collectively 
+                        try to cover all goals.
+
+                        <!-- We consider the problem of multi-agent navigation and 
+                        collision avoidance when observations are limited to the 
+                        local neighborhood of each agent. We propose <b>InforMARL</b>, 
+                        a novel architecture for multi-agent reinforcement learning (MARL) 
+                        which uses local information intelligently to compute paths 
+                        for all the agents in a decentralized manner. Specifically, 
+                        InforMARL aggregates information about the local neighborhood 
+                        of agents for both the actor and the critic using a graph 
+                        neural network and can be used in conjunction with any 
+                        standard MARL algorithm. We show that (1) in training, 
+                        InforMARL has better sample efficiency and performance 
                         than baseline approaches, despite using less information, 
                         and (2) in testing, it scales well to environments with 
-                        arbitrary numbers of agents and obstacles.
+                        arbitrary numbers of agents and obstacles. -->
                         <br>
                     </p>
             </div>
@@ -275,7 +294,7 @@
                         <center>
                             <figure>
                                 <image src="img/plots/local_nbd_global.png" class="center" alt="The MDP for RL agent" height="340"/>
-                                <figcaption><b><br>Fig 1:</b> MAPPO with the 
+                                <figcaption><b><br>Figure 1:</b> MAPPO with the 
                                     local, neighborhood (with 1, 3, and 5 
                                     <i>max-nbd-entities</i>), and global 
                                     information given as states. The plots show 
@@ -297,7 +316,7 @@
                         <center>
                             <figure>
                                 <image src="img/less_info.png" class="center" alt="The MDP for RL agent" height="340"/>
-                                <figcaption><b><br>Fig </b> The title of our paper in an alternate universe where academic papers can be informa(r)l </figcaption>
+                                <figcaption><b><br>Figure 2 </b> The title of our paper in an alternate universe where academic papers can be informa(r)l </figcaption>
                             </figure>
                         </center>
 
@@ -322,7 +341,7 @@
                     <center>
                         <figure>
                             <image src="img/graphMARLArch.v8.png" class="center" alt="The MDP for RL agent" height="340"/>
-                            <figcaption><b><br>Figure 1:</b> Overview of our method - <i>InforMARL</i> </figcaption>
+                            <figcaption><b><br>Figure 3:</b> Overview of our method - <i>InforMARL</i> </figcaption>
                         </figure>
                     </center>
 
@@ -367,10 +386,51 @@
                 </h3>
                     <p class="text-justify">
                         <h4>
+                            Environments
+                        </h4>
+                        We evaluate our method on the following environments:
+                        <ul>
+                            <li> <b>Target</b>: Each agent tries to reach its preassigned 
+                                goal while avoiding collisions with other entities 
+                                in the environment.</li>
+                            <li> <b>Coverage</b>: Each agent tries to go to a goal 
+                                while avoidin collsions with other entities, and 
+                                ensuring that no more than one agent reaches 
+                                the same goal.</li>
+                            <li> <b>Formation</b>: There is a single landmark (the counterpart 
+                                of a goal for this task) and the agents try to position
+                                themselves in an N-sided regular polygon with the 
+                                landmark at its centre.</li>
+                            <li> <b> Line</b>: There are two landmarks, and the 
+                                agents try to position themselves equally spread 
+                                out in a line between the two.</li>
+                        </ul>
+                        
+                        <center>
+                            <div class="row">
+                                <div class="column">
+                                    <img src="img/navigation.png" style="float: left; height: 150px; margin-right: 2%; margin-bottom: 0.5em; border: 1px solid #555">
+                                </div>
+                                <div class="column">
+                                    <img src="img/spread.png" style="float: left; height: 150px; margin-right: 2%; margin-bottom: 0.5em; border: 1px solid #555">
+                                </div>
+                                <div class="column">
+                                    <img src="img/formation.png" style="float: left; height: 150px; margin-right: 2%; margin-bottom: 0.5em; border: 1px solid #555">
+                                </div>
+                                <div class="column">
+                                    <img src="img/line.png" style="height: 150px; border: 1px solid #555">
+                                </div>
+                                <figcaption><b><br>Figure 4</b>: The <i>Target</i>, <i>Coverage</i>, <i>Formation</i> and <i>Line</i> environments. 
+                                </figcaption>
+                            </div>
+                        </center>
+                        <br>
+
+                        <h4>
                             Comparisons against other methods
                         </h4>
                         We compare our method with a few different MARL baselines 
-                        in the navigation environment. 
+                        in the <i>Target</i> environment. 
                         <!-- We compare the following algorithms:
                         <ul>
                             <li>"Multi-Agent Proximal Policy Optimization" (MAPPO)</li>
@@ -399,7 +459,7 @@
                             <div class="column">
                                 <img src="img/plots/legend_3_short_transpose.png" alt="Mountains" style="width:100%">
                             </div>
-                            <figcaption><b><br>Figure 2</b>: Comparison of the 
+                            <figcaption><b><br>Figure 5</b>: Comparison of the 
                             training performance of InforMARL with the 
                             best-performing baselines using global and local information. 
                             InforMARL significantly outperforms most baseline algorithms. 
@@ -424,7 +484,7 @@
                             <image src="img/compare_table.png" class="noPadding" alt="Comparison Table" height="350"/>
                             <figcaption><b><br>Table 1</b>: Comparison of InforMARL 
                             with other baseline methods, for scenarios with 3, 7, and 10 
-                            agents in the environment. The results presented 
+                            agents in the <i>Target</i> environment. The results presented 
                             represent the average of 100 test episodes.  </figcaption>
                         </figure>
 
@@ -437,19 +497,35 @@
                         <center>
                             <figure>
                                 <image src="img/scale_table.png" class="center" alt="The weight extraction method" height="350"/>
-                                <figcaption><b><br>Table 2</b>: Test performance of InforMARL, 
+                                <figcaption><b><br>Table 2</b>: Test performance of InforMARL for the <i>Target</i> environment, 
                                 when trained on scenarios with 
                                 <img src="https://latex.codecogs.com/svg.image?n"/> 
                                 agents and tested on scenarios with 
                                 <img src="https://latex.codecogs.com/svg.image?m"/> 
-                                agents in the environment. InforMARL is able to achieve a 
+                                agents in the environment. 
+                                <!-- InforMARL is able to achieve a 
                                 success rate of nearly 100% while the fraction 
                                 of episodes taken to reach the goals 
                                 (<img src="https://latex.codecogs.com/svg.image?T"/>) 
                                 is almost constant. Note that we normalize the 
                                 reward and the number of collisions by 
                                 <img src="https://latex.codecogs.com/svg.image?m"/> 
-                                for ease of comparison.
+                                for ease of comparison. -->
+                                </figcaption>
+                            </figure>
+                        </center>
+
+                        <h4>
+                            Performance in Other Task Environments
+                        </h4>
+                        <center>
+                            <figure>
+                                <image src="img/multi_envs.png" class="center" alt="other envs" height="250"/>
+                                <figcaption><b><br>Table 3</b>: Performance of RMAPPO and InforMARL on the
+                                    coverage, formation, and line tasks. We note that Infor-
+                                    MARL was trained on the 3-agent scenario and tested on
+                                    m = {3, 7} agents, while RMAPPO was trained and tested
+                                    on the same number of agents (i.e., with m = n).
                                 </figcaption>
                             </figure>
                         </center>
