@@ -12,10 +12,21 @@
 
 </div>
 
-**Code for our paper**: [Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation](http://arxiv.org/abs/2211.02127)
-<!-- **Code for our paper**: [Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation](https://nsidn98.github.io/files/InforMARL_Arxiv.pdf) -->
 
-**Authors**: [Siddharth Nayak](http://nsidn98.github.io/), [Kenneth Choi](https://www.linkedin.com/in/kennethschoi/), [Wenqi Ding](https://github.com/dingwq22), [Sydney Dolan](https://sydneyidolan.com/), [Karthik Gopalakrishnan](https://karthikg.mit.edu/about-me), [Hamsa Balakrishnan](http://www.mit.edu/~hamsa/)
+A graph neural network framework for multi-agent reinforcement learning with limited local observability for each agent. This is an official implementation of the model described in:
+
+"[Scalable Multi-Agent Reinforcement Learning through Intelligent Information Aggregation](http://arxiv.org/abs/2211.02127)",
+
+[Siddharth Nayak](http://nsidn98.github.io/), [Kenneth Choi](https://www.linkedin.com/in/kennethschoi/), [Wenqi Ding](https://github.com/dingwq22), [Sydney Dolan](https://sydneyidolan.com/), [Karthik Gopalakrishnan](https://karthikg.mit.edu/about-me), [Hamsa Balakrishnan](http://www.mit.edu/~hamsa/)
+
+
+April 2023 - The paper was accepted to ICML'2023! See you in Honolulu in July 2023
+
+Dec 2022 - Presented a short version of this paper at the [Strategic Multi-Agent Interactions: Game Theory for Robot Learning and Decision Making Workshop](https://sites.google.com/view/corl-2022-games-workshop/) at [CoRL](https://corl2022.org/) in Auckland. You can find the recording [here](https://youtu.be/8Ig2LYGvRuk?t=9617).
+
+Please let us know if anything here is not working as expected, and feel free to create [new issues](https://github.com/nsidn98/InforMARL/issues) with any questions.
+
+
 
 ## Abstract:
 We consider the problem of multi-agent navigation and collision avoidance when observations are limited to the local neighborhood of each agent. We propose *InforMARL*, a novel architecture for multi-agent reinforcement learning (MARL) which uses local information intelligently to compute paths for all the agents in a decentralized manner. Specifically, InforMARL aggregates information about the local neighborhood of agents for both the actor and the critic using a graph neural network and can be used in conjunction with any standard MARL algorithm. We show that (1) in training, InforMARL has better sample efficiency and performance than baseline approaches, despite using less information, and (2) in testing, it scales well to environments with arbitrary numbers of agents and obstacles.
