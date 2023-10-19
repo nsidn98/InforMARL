@@ -13,6 +13,7 @@
 import argparse
 import numpy as np
 import os, sys
+
 sys.path.append(os.path.abspath(os.getcwd()))
 
 from multiagent.core import World, Agent, Landmark
@@ -30,11 +31,10 @@ class Scenario(BaseScenario):
         world.collaborative = True
         # add agents
         world.num_agents = args.num_agents  # 2
-        assert world.num_agents == 2, (
-            "only 2 agents is supported, check the config.py.")
+        assert world.num_agents == 2, "only 2 agents is supported, check the config.py."
         world.agents = [Agent() for i in range(world.num_agents)]
         for i, agent in enumerate(world.agents):
-            agent.name = 'agent %d' % i
+            agent.name = "agent %d" % i
             agent.collide = False
             agent.size = 0.075
         # speaker
@@ -44,7 +44,7 @@ class Scenario(BaseScenario):
         # add landmarks
         world.landmarks = [Landmark() for i in range(world.num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
-            landmark.name = 'landmark %d' % i
+            landmark.name = "landmark %d" % i
             landmark.collide = False
             landmark.movable = False
             landmark.size = 0.04
@@ -69,8 +69,9 @@ class Scenario(BaseScenario):
         world.landmarks[1].color = np.array([0.15, 0.65, 0.15])
         world.landmarks[2].color = np.array([0.15, 0.15, 0.65])
         # special colors for goals
-        world.agents[0].goal_a.color = world.agents[0].goal_b.color + \
-            np.array([0.45, 0.45, 0.45])
+        world.agents[0].goal_a.color = world.agents[0].goal_b.color + np.array(
+            [0.45, 0.45, 0.45]
+        )
         # set random initial states
         for agent in world.agents:
             agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)
@@ -115,17 +116,18 @@ class Scenario(BaseScenario):
         if agent.silent:
             return np.concatenate([agent.state.p_vel] + entity_pos + comm)
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     from multiagent.environment import MultiAgentOrigEnv
     from multiagent.policy import InteractivePolicy
 
     # makeshift argparser
     class Args:
         def __init__(self):
-            self.num_agents:int=2
-            self.num_landmarks:int=3
-            self.episode_length:int=25
+            self.num_agents: int = 2
+            self.num_landmarks: int = 3
+            self.episode_length: int = 25
+
     args = Args()
 
     scenario = Scenario()
@@ -133,18 +135,21 @@ if __name__ == "__main__":
     # create world
     world = scenario.make_world(args)
     # create multiagent environment
-    env = MultiAgentOrigEnv(world=world, reset_callback=scenario.reset_world, 
-                        reward_callback=scenario.reward, 
-                        observation_callback=scenario.observation, 
-                        done_callback= scenario.done if hasattr(scenario, 'done') else None,
-                        shared_viewer = False)
+    env = MultiAgentOrigEnv(
+        world=world,
+        reset_callback=scenario.reset_world,
+        reward_callback=scenario.reward,
+        observation_callback=scenario.observation,
+        done_callback=scenario.done if hasattr(scenario, "done") else None,
+        shared_viewer=False,
+    )
     # render call to create viewer window
     env.render()
     # create interactive policies for each agent
-    policies = [InteractivePolicy(env,i) for i in range(env.n)]
+    policies = [InteractivePolicy(env, i) for i in range(env.n)]
     # execution loop
     obs_n = env.reset()
-    stp=0
+    stp = 0
     while True:
         # query for action from each agent's policy
         act_n = []
@@ -154,4 +159,4 @@ if __name__ == "__main__":
         obs_n, reward_n, done_n, info_n = env.step(act_n)
         # render all agent views
         env.render()
-        stp+=1
+        stp += 1

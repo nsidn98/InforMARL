@@ -10,6 +10,7 @@ Modify standard PyTorch distributions so they to make compatible with this codeb
 # Standardize distribution interfaces
 #
 
+
 # Categorical
 class FixedCategorical(torch.distributions.Categorical):
     def sample(self):
@@ -54,34 +55,38 @@ class FixedBernoulli(torch.distributions.Bernoulli):
 
 class Categorical(nn.Module):
     """
-        Categorical Distribution for discrete action space modified to 
-        renormalise probs with available_actions. 
-        Has a linear layer followed by renormalisation of the obtained logits
+    Categorical Distribution for discrete action space modified to
+    renormalise probs with available_actions.
+    Has a linear layer followed by renormalisation of the obtained logits
     """
-    def __init__(self, 
-                num_inputs:int, 
-                num_outputs:int, 
-                use_orthogonal:bool=True, 
-                gain:float=0.01):
+
+    def __init__(
+        self,
+        num_inputs: int,
+        num_outputs: int,
+        use_orthogonal: bool = True,
+        gain: float = 0.01,
+    ):
         """
-            Params
-            num_inputs: int
-                The input dimension for the linear layer
-            num_outputs: int
-                The output dimension for the linear layer
-            use_orthogonal: bool
-                Whether we want to use orthogonal weight init or Xavier uniform
-            gain: float
-                The gain for weight init
+        Params
+        num_inputs: int
+            The input dimension for the linear layer
+        num_outputs: int
+            The output dimension for the linear layer
+        use_orthogonal: bool
+            Whether we want to use orthogonal weight init or Xavier uniform
+        gain: float
+            The gain for weight init
         """
         super(Categorical, self).__init__()
         init_method = [nn.init.xavier_uniform_, nn.init.orthogonal_][use_orthogonal]
-        def init_(m): 
+
+        def init_(m):
             return init(m, init_method, lambda x: nn.init.constant_(x, 0), gain)
 
         self.linear = init_(nn.Linear(num_inputs, num_outputs))
 
-    def forward(self, x:torch.tensor, available_actions=None):
+    def forward(self, x: torch.tensor, available_actions=None):
         x = self.linear(x)
         # supress the logits at all non-available actions
         if available_actions is not None:
@@ -91,35 +96,39 @@ class Categorical(nn.Module):
 
 class DiagGaussian(nn.Module):
     """
-        Diagonal Gaussian Distribution for continuous action space modified to 
-        renormalise probs with available_actions. 
+    Diagonal Gaussian Distribution for continuous action space modified to
+    renormalise probs with available_actions.
     """
-    def __init__(self, 
-                num_inputs:int, 
-                num_outputs:int, 
-                use_orthogonal:bool=True, 
-                gain:float=0.01):
+
+    def __init__(
+        self,
+        num_inputs: int,
+        num_outputs: int,
+        use_orthogonal: bool = True,
+        gain: float = 0.01,
+    ):
         """
-            Params
-            num_inputs: int
-                The input dimension for the linear layer
-            num_outputs: int
-                The output dimension for the linear layer
-            use_orthogonal: bool
-                Whether we want to use orthogonal weight init or Xavier uniform
-            gain: float
-                The gain for weight init
+        Params
+        num_inputs: int
+            The input dimension for the linear layer
+        num_outputs: int
+            The output dimension for the linear layer
+        use_orthogonal: bool
+            Whether we want to use orthogonal weight init or Xavier uniform
+        gain: float
+            The gain for weight init
         """
         super(DiagGaussian, self).__init__()
 
         init_method = [nn.init.xavier_uniform_, nn.init.orthogonal_][use_orthogonal]
-        def init_(m): 
+
+        def init_(m):
             return init(m, init_method, lambda x: nn.init.constant_(x, 0), gain)
 
         self.fc_mean = init_(nn.Linear(num_inputs, num_outputs))
         self.logstd = AddBias(torch.zeros(num_outputs))
 
-    def forward(self, x:torch.tensor):
+    def forward(self, x: torch.tensor):
         action_mean = self.fc_mean(x)
 
         zeros = torch.zeros(action_mean.size())
@@ -132,42 +141,47 @@ class DiagGaussian(nn.Module):
 
 class Bernoulli(nn.Module):
     """
-        Bernoulli Distribution for discrete action space modified to 
-        renormalise probs with available_actions. 
+    Bernoulli Distribution for discrete action space modified to
+    renormalise probs with available_actions.
     """
-    def __init__(self, 
-                num_inputs:int, 
-                num_outputs:int, 
-                use_orthogonal:bool=True, 
-                gain:float=0.01):
+
+    def __init__(
+        self,
+        num_inputs: int,
+        num_outputs: int,
+        use_orthogonal: bool = True,
+        gain: float = 0.01,
+    ):
         """
-            Params
-            num_inputs: int
-                The input dimension for the linear layer
-            num_outputs: int
-                The output dimension for the linear layer
-            use_orthogonal: bool
-                Whether we want to use orthogonal weight init or Xavier uniform
-            gain: float
-                The gain for weight init
+        Params
+        num_inputs: int
+            The input dimension for the linear layer
+        num_outputs: int
+            The output dimension for the linear layer
+        use_orthogonal: bool
+            Whether we want to use orthogonal weight init or Xavier uniform
+        gain: float
+            The gain for weight init
         """
         super(Bernoulli, self).__init__()
         init_method = [nn.init.xavier_uniform_, nn.init.orthogonal_][use_orthogonal]
-        def init_(m): 
+
+        def init_(m):
             return init(m, init_method, lambda x: nn.init.constant_(x, 0), gain)
-        
+
         self.linear = init_(nn.Linear(num_inputs, num_outputs))
 
     def forward(self, x):
         x = self.linear(x)
         return FixedBernoulli(logits=x)
 
+
 class AddBias(nn.Module):
-    def __init__(self, bias:torch.tensor):
+    def __init__(self, bias: torch.tensor):
         super(AddBias, self).__init__()
         self._bias = nn.Parameter(bias.unsqueeze(1))
 
-    def forward(self, x:torch.tensor):
+    def forward(self, x: torch.tensor):
         if x.dim() == 2:
             bias = self._bias.t().view(1, -1)
         else:

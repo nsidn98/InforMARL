@@ -7,8 +7,8 @@ import six
 import sys
 
 if "Apple" in sys.version:
-    if 'DYLD_FALLBACK_LIBRARY_PATH' in os.environ:
-        os.environ['DYLD_FALLBACK_LIBRARY_PATH'] += ':/usr/lib'
+    if "DYLD_FALLBACK_LIBRARY_PATH" in os.environ:
+        os.environ["DYLD_FALLBACK_LIBRARY_PATH"] += ":/usr/lib"
         # (JDS 2016/04/15): avoid bug on Anaconda 2.3.0 / Yosemite
 
 from gym.utils import reraise
@@ -18,13 +18,16 @@ try:
     import pyglet
 except ImportError as e:
     reraise(
-        suffix="HINT: you can install pyglet directly via 'pip install pyglet'. But if you really just want to install all Gym dependencies and not have to think about it, 'pip install -e .[all]' or 'pip install gym[all]' will do it.")
+        suffix="HINT: you can install pyglet directly via 'pip install pyglet'. But if you really just want to install all Gym dependencies and not have to think about it, 'pip install -e .[all]' or 'pip install gym[all]' will do it."
+    )
 
 try:
     from pyglet.gl import *
 except ImportError as e:
-    reraise(prefix="Error occured while running `from pyglet.gl import *`",
-            suffix="HINT: make sure you have OpenGL install. On Ubuntu, you can run 'apt-get install python-opengl'. If you're running on a server, you may need a virtual frame buffer; something like this should work: 'xvfb-run -s \"-screen 0 1400x900x24\" python <your_script.py>'")
+    reraise(
+        prefix="Error occured while running `from pyglet.gl import *`",
+        suffix="HINT: make sure you have OpenGL install. On Ubuntu, you can run 'apt-get install python-opengl'. If you're running on a server, you may need a virtual frame buffer; something like this should work: 'xvfb-run -s \"-screen 0 1400x900x24\" python <your_script.py>'",
+    )
 
 import math
 import numpy as np
@@ -44,7 +47,10 @@ def get_display(spec):
         return pyglet.canvas.Display(spec)
     else:
         raise error.Error(
-            'Invalid display specification: {}. (Must be a string like :0 or None.)'.format(spec))
+            "Invalid display specification: {}. (Must be a string like :0 or None.)".format(
+                spec
+            )
+        )
 
 
 class Viewer(object):
@@ -54,8 +60,7 @@ class Viewer(object):
         self.width = width
         self.height = height
 
-        self.window = pyglet.window.Window(
-            width=width, height=height, display=display)
+        self.window = pyglet.window.Window(width=width, height=height, display=display)
         self.window.on_close = self.window_closed_by_user
         self.geoms = []
         self.onetime_geoms = []
@@ -77,11 +82,11 @@ class Viewer(object):
 
     def set_bounds(self, left, right, bottom, top):
         assert right > left and top > bottom
-        scalex = self.width/(right-left)
-        scaley = self.height/(top-bottom)
+        scalex = self.width / (right - left)
+        scaley = self.height / (top - bottom)
         self.transform = Transform(
-            translation=(-left*scalex, -bottom*scaley),
-            scale=(scalex, scaley))
+            translation=(-left * scalex, -bottom * scaley), scale=(scalex, scaley)
+        )
 
     def add_geom(self, geom):
         self.geoms.append(geom)
@@ -104,7 +109,7 @@ class Viewer(object):
         if return_rgb_array:
             buffer = pyglet.image.get_buffer_manager().get_color_buffer()
             image_data = buffer.get_image_data()
-            arr = np.fromstring(image_data.data, dtype=np.uint8, sep='')
+            arr = np.fromstring(image_data.data, dtype=np.uint8, sep="")
             # In https://github.com/openai/gym-http-api/issues/2, we
             # discovered that someone using Xmonad on Arch was having
             # a window of size 598 x 398, though a 600 x 400 window
@@ -144,9 +149,11 @@ class Viewer(object):
 
     def get_array(self):
         self.window.flip()
-        image_data = pyglet.image.get_buffer_manager().get_color_buffer().get_image_data()
+        image_data = (
+            pyglet.image.get_buffer_manager().get_color_buffer().get_image_data()
+        )
         self.window.flip()
-        arr = np.fromstring(image_data.data, dtype=np.uint8, sep='')
+        arr = np.fromstring(image_data.data, dtype=np.uint8, sep="")
         arr = arr.reshape(self.height, self.width, 4)
         return arr[::-1, :, 0:3]
 
@@ -268,8 +275,12 @@ class FilledPolygon(Geom):
             glVertex3f(p[0], p[1], 0)  # draw each vertex
         glEnd()
 
-        color = (self._color.vec4[0] * 0.5, self._color.vec4[1] *
-                 0.5, self._color.vec4[2] * 0.5, self._color.vec4[3] * 0.5)
+        color = (
+            self._color.vec4[0] * 0.5,
+            self._color.vec4[1] * 0.5,
+            self._color.vec4[2] * 0.5,
+            self._color.vec4[3] * 0.5,
+        )
         glColor4f(*color)
         glBegin(GL_LINE_LOOP)
         for p in self.v:
@@ -280,8 +291,8 @@ class FilledPolygon(Geom):
 def make_circle(radius=10, res=30, filled=True):
     points = []
     for i in range(res):
-        ang = 2*math.pi*i / res
-        points.append((math.cos(ang)*radius, math.sin(ang)*radius))
+        ang = 2 * math.pi * i / res
+        points.append((math.cos(ang) * radius, math.sin(ang) * radius))
     if filled:
         return FilledPolygon(points)
     else:
@@ -300,10 +311,10 @@ def make_polyline(v):
 
 
 def make_capsule(length, width):
-    l, r, t, b = 0, length, width/2, -width/2
+    l, r, t, b = 0, length, width / 2, -width / 2
     box = make_polygon([(l, b), (l, t), (r, t), (r, b)])
-    circ0 = make_circle(width/2)
-    circ1 = make_circle(width/2)
+    circ0 = make_circle(width / 2)
+    circ1 = make_circle(width / 2)
     circ1.add_attr(Transform(translation=(length, 0)))
     geom = Compound([box, circ0, circ1])
     return geom
@@ -364,8 +375,10 @@ class Image(Geom):
         self.flip = False
 
     def render1(self):
-        self.img.blit(-self.width/2, -self.height/2,
-                      width=self.width, height=self.height)
+        self.img.blit(
+            -self.width / 2, -self.height / 2, width=self.width, height=self.height
+        )
+
 
 # ================================================================
 
@@ -380,14 +393,19 @@ class SimpleImageViewer(object):
         if self.window is None:
             height, width, channels = arr.shape
             self.window = pyglet.window.Window(
-                width=width, height=height, display=self.display)
+                width=width, height=height, display=self.display
+            )
             self.width = width
             self.height = height
             self.isopen = True
         assert arr.shape == (
-            self.height, self.width, 3), "You passed in an image with the wrong number shape"
+            self.height,
+            self.width,
+            3,
+        ), "You passed in an image with the wrong number shape"
         image = pyglet.image.ImageData(
-            self.width, self.height, 'RGB', arr.tobytes(), pitch=self.width * -3)
+            self.width, self.height, "RGB", arr.tobytes(), pitch=self.width * -3
+        )
         self.window.clear()
         self.window.switch_to()
         self.window.dispatch_events()

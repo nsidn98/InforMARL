@@ -12,11 +12,10 @@ class Scenario(BaseScenario):
         world.collaborative = True  # whether agents share rewards
         # add agents
         world.num_agents = args.num_agents  # 2
-        assert world.num_agents == 2, (
-            "only 2 agents is supported, check the config.py.")
+        assert world.num_agents == 2, "only 2 agents is supported, check the config.py."
         world.agents = [Agent() for i in range(world.num_agents)]
         for i, agent in enumerate(world.agents):
-            agent.name = 'agent %d' % i
+            agent.name = "agent %d" % i
             agent.collide = False
             # agent.u_noise = 1e-1
             # agent.c_noise = 1e-1
@@ -24,7 +23,7 @@ class Scenario(BaseScenario):
         world.num_landmarks = args.num_landmarks  # 3
         world.landmarks = [Landmark() for i in range(world.num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
-            landmark.name = 'landmark %d' % i
+            landmark.name = "landmark %d" % i
             landmark.collide = False
             landmark.movable = False
         # make initial conditions
@@ -62,8 +61,7 @@ class Scenario(BaseScenario):
     def reward(self, agent, world):
         if agent.goal_a is None or agent.goal_b is None:
             return 0.0
-        dist2 = np.sum(
-            np.square(agent.goal_a.state.p_pos - agent.goal_b.state.p_pos))
+        dist2 = np.sum(np.square(agent.goal_a.state.p_pos - agent.goal_b.state.p_pos))
         return -dist2  # np.exp(-dist2)
 
     def observation(self, agent, world):

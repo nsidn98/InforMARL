@@ -4,6 +4,7 @@ from baselines.offpolicy.utils.util import init, to_torch
 from baselines.offpolicy.algorithms.utils.mlp import MLPBase
 from baselines.offpolicy.algorithms.utils.act import ACTLayer
 
+
 class MADDPG_Actor(nn.Module):
     def __init__(self, args, obs_dim, act_dim, device):
         """
@@ -50,6 +51,7 @@ class MADDPG_Critic(nn.Module):
     :param device: (torch.device) specifies the device to run on (cpu/gpu).
     :param num_q_outs: (int) number of q values to output (1 for MADDPG, 2 for MATD3).
     """
+
     def __init__(self, args, central_obs_dim, central_act_dim, device, num_q_outs=1):
         super(MADDPG_Critic, self).__init__()
         self._use_orthogonal = args.use_orthogonal
@@ -61,11 +63,15 @@ class MADDPG_Critic(nn.Module):
 
         self.mlp = MLPBase(args, input_dim)
 
-        init_method = [nn.init.xavier_uniform_, nn.init.orthogonal_][self._use_orthogonal]
+        init_method = [nn.init.xavier_uniform_, nn.init.orthogonal_][
+            self._use_orthogonal
+        ]
+
         def init_(m):
             return init(m, init_method, lambda x: nn.init.constant_(x, 0))
+
         self.q_outs = [init_(nn.Linear(self.hidden_size, 1)) for _ in range(num_q_outs)]
-        
+
         self.to(device)
 
     def forward(self, central_obs, central_act):

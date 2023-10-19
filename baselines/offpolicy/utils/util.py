@@ -9,11 +9,14 @@ import torch.nn.functional as F
 import torch.distributed as dist
 from torch.autograd import Variable
 
+
 def to_torch(input):
     return torch.from_numpy(input) if type(input) == np.ndarray else input
 
+
 def to_numpy(x):
     return x.detach().cpu().numpy()
+
 
 class FixedCategorical(torch.distributions.Categorical):
     def sample(self):
@@ -56,13 +59,22 @@ class MultiDiscrete(gym.Space):
         self.n = np.sum(self.high) + 2
 
     def sample(self):
-        """ Returns a array with one sample from each discrete action space """
+        """Returns a array with one sample from each discrete action space"""
         # For each row: round(random .* (max - min) + min, 0)
         random_array = np.random.rand(self.num_discrete_space)
-        return [int(x) for x in np.floor(np.multiply((self.high - self.low + 1.), random_array) + self.low)]
+        return [
+            int(x)
+            for x in np.floor(
+                np.multiply((self.high - self.low + 1.0), random_array) + self.low
+            )
+        ]
 
     def contains(self, x):
-        return len(x) == self.num_discrete_space and (np.array(x) >= self.low).all() and (np.array(x) <= self.high).all()
+        return (
+            len(x) == self.num_discrete_space
+            and (np.array(x) >= self.low).all()
+            and (np.array(x) <= self.high).all()
+        )
 
     @property
     def shape(self):
@@ -72,16 +84,13 @@ class MultiDiscrete(gym.Space):
         return "MultiDiscrete" + str(self.num_discrete_space)
 
     def __eq__(self, other):
-        return np.array_equal(self.low, other.low) and np.array_equal(self.high, other.high)
+        return np.array_equal(self.low, other.low) and np.array_equal(
+            self.high, other.high
+        )
 
 
-class DecayThenFlatSchedule():
-    def __init__(self,
-                 start,
-                 finish,
-                 time_length,
-                 decay="exp"):
-
+class DecayThenFlatSchedule:
+    def __init__(self, start, finish, time_length, decay="exp"):
         self.start = start
         self.finish = finish
         self.time_length = time_length
@@ -89,21 +98,23 @@ class DecayThenFlatSchedule():
         self.decay = decay
 
         if self.decay in ["exp"]:
-            self.exp_scaling = (-1) * self.time_length / \
-                np.log(self.finish) if self.finish > 0 else 1
+            self.exp_scaling = (
+                (-1) * self.time_length / np.log(self.finish) if self.finish > 0 else 1
+            )
 
     def eval(self, T):
         if self.decay in ["linear"]:
             return max(self.finish, self.start - self.delta * T)
         elif self.decay in ["exp"]:
-            return min(self.start, max(self.finish, np.exp(- T / self.exp_scaling)))
+            return min(self.start, max(self.finish, np.exp(-T / self.exp_scaling)))
+
     pass
 
 
 def huber_loss(e, d):
     a = (abs(e) <= d).float()
     b = (e > d).float()
-    return a*e**2/2 + b*d*(abs(e)-d/2)
+    return a * e**2 / 2 + b * d * (abs(e) - d / 2)
 
 
 def mse_loss(e):
@@ -119,6 +130,7 @@ def init(module, weight_init, bias_init, gain=1):
 def get_clones(module, N):
     return nn.ModuleList([copy.deepcopy(module) for i in range(N)])
 
+
 # https://github.com/ikostrikov/pytorch-ddpg-naf/blob/master/ddpg.py#L11
 def soft_update(target, source, tau):
     """
@@ -130,8 +142,8 @@ def soft_update(target, source, tau):
         tau (float, 0 < x < 1): Weight factor for update
     """
     for target_param, param in zip(target.parameters(), source.parameters()):
-        target_param.data.copy_(
-            target_param.data * (1.0 - tau) + param.data * tau)
+        target_param.data.copy_(target_param.data * (1.0 - tau) + param.data * tau)
+
 
 # https://github.com/ikostrikov/pytorch-ddpg-naf/blob/master/ddpg.py#L15
 def hard_update(target, source):
@@ -144,9 +156,10 @@ def hard_update(target, source):
     for target_param, param in zip(target.parameters(), source.parameters()):
         target_param.data.copy_(param.data)
 
+
 # https://github.com/seba-1511/dist_tuto.pth/blob/gh-pages/train_dist.py
 def average_gradients(model):
-    """ Gradient averaging. """
+    """Gradient averaging."""
     size = float(dist.get_world_size())
     for param in model.parameters():
         dist.all_reduce(param.grad.data, op=dist.reduce_op.SUM, group=0)
@@ -160,7 +173,7 @@ def onehot_from_logits(logits, avail_logits=None, eps=0.0):
     """
     # get best (according to current policy) actions in one-hot form
     logits = to_torch(logits)
-    
+
     dim = len(logits.shape) - 1
     if avail_logits is not None:
         avail_logits = to_torch(avail_logits)
@@ -169,10 +182,20 @@ def onehot_from_logits(logits, avail_logits=None, eps=0.0):
     if eps == 0.0:
         return argmax_acs
     # get random actions in one-hot form
-    rand_acs = Variable(torch.eye(logits.shape[1])[[np.random.choice(range(logits.shape[1]), size=logits.shape[0])]], requires_grad=False)
+    rand_acs = Variable(
+        torch.eye(logits.shape[1])[
+            [np.random.choice(range(logits.shape[1]), size=logits.shape[0])]
+        ],
+        requires_grad=False,
+    )
     # chooses between best and random actions using epsilon greedy
-    return torch.stack([argmax_acs[i] if r > eps else rand_acs[i] for i, r in
-                        enumerate(torch.rand(logits.shape[0]))])
+    return torch.stack(
+        [
+            argmax_acs[i] if r > eps else rand_acs[i]
+            for i, r in enumerate(torch.rand(logits.shape[0]))
+        ]
+    )
+
 
 # modified for PyTorch from https://github.com/ericjang/gumbel-softmax/blob/master/Categorical%20VAE.ipynb
 def sample_gumbel(shape, eps=1e-20, tens_type=torch.FloatTensor):
@@ -180,23 +203,30 @@ def sample_gumbel(shape, eps=1e-20, tens_type=torch.FloatTensor):
     U = Variable(tens_type(*shape).uniform_(), requires_grad=False)
     return -torch.log(-torch.log(U + eps) + eps)
 
+
 # modified for PyTorch from https://github.com/ericjang/gumbel-softmax/blob/master/Categorical%20VAE.ipynb
-def gumbel_softmax_sample(logits, avail_logits, temperature, device=torch.device('cpu')):
-    """ Draw a sample from the Gumbel-Softmax distribution"""
-    if str(device) == 'cpu':
+def gumbel_softmax_sample(
+    logits, avail_logits, temperature, device=torch.device("cpu")
+):
+    """Draw a sample from the Gumbel-Softmax distribution"""
+    if str(device) == "cpu":
         y = logits + sample_gumbel(logits.shape, tens_type=type(logits.data))
     else:
-        y = (logits.cpu() + sample_gumbel(logits.shape,
-                                          tens_type=type(logits.data))).cuda()
+        y = (
+            logits.cpu() + sample_gumbel(logits.shape, tens_type=type(logits.data))
+        ).cuda()
 
     dim = len(logits.shape) - 1
     if avail_logits is not None:
         avail_logits = to_torch(avail_logits).to(device)
-        y[avail_logits==0] = -1e10
+        y[avail_logits == 0] = -1e10
     return F.softmax(y / temperature, dim=dim)
 
+
 # modified for PyTorch from https://github.com/ericjang/gumbel-softmax/blob/master/Categorical%20VAE.ipynb
-def gumbel_softmax(logits, avail_logits=None, temperature=1.0, hard=False, device=torch.device('cpu')):
+def gumbel_softmax(
+    logits, avail_logits=None, temperature=1.0, hard=False, device=torch.device("cpu")
+):
     """Sample from the Gumbel-Softmax distribution and optionally discretize.
     Args:
       logits: [batch_size, n_class] unnormalized log-probs
@@ -217,6 +247,7 @@ def gumbel_softmax(logits, avail_logits=None, temperature=1.0, hard=False, devic
 def gaussian_noise(shape, std):
     return torch.empty(shape).normal_(mean=0, std=std)
 
+
 def get_obs_shape(obs_space):
     if obs_space.__class__.__name__ == "Box":
         obs_shape = obs_space.shape
@@ -224,8 +255,9 @@ def get_obs_shape(obs_space):
         obs_shape = obs_space
     else:
         raise NotImplementedError
-    
+
     return obs_shape
+
 
 def get_dim_from_space(space):
     if isinstance(space, Box):
@@ -244,8 +276,9 @@ def get_dim_from_space(space):
 
 
 def get_state_dim(observation_dict, action_dict):
-    combined_obs_dim = sum([get_dim_from_space(space)
-                            for space in observation_dict.values()])
+    combined_obs_dim = sum(
+        [get_dim_from_space(space) for space in observation_dict.values()]
+    )
     combined_act_dim = 0
     for space in action_dict.values():
         dim = get_dim_from_space(space)
@@ -253,7 +286,7 @@ def get_state_dim(observation_dict, action_dict):
             combined_act_dim += int(sum(dim))
         else:
             combined_act_dim += dim
-    return combined_obs_dim, combined_act_dim, combined_obs_dim+combined_act_dim
+    return combined_obs_dim, combined_act_dim, combined_obs_dim + combined_act_dim
 
 
 def get_cent_act_dim(action_space):
@@ -299,7 +332,7 @@ def avail_choose(x, avail_x=None):
     if avail_x is not None:
         avail_x = to_torch(avail_x)
         x[avail_x == 0] = -1e10
-    return x#FixedCategorical(logits=x)
+    return x  # FixedCategorical(logits=x)
 
 
 def tile_images(img_nhwc):
@@ -315,25 +348,26 @@ def tile_images(img_nhwc):
     img_nhwc = np.asarray(img_nhwc)
     N, h, w, c = img_nhwc.shape
     H = int(np.ceil(np.sqrt(N)))
-    W = int(np.ceil(float(N)/H))
-    img_nhwc = np.array(
-        list(img_nhwc) + [img_nhwc[0]*0 for _ in range(N, H*W)])
+    W = int(np.ceil(float(N) / H))
+    img_nhwc = np.array(list(img_nhwc) + [img_nhwc[0] * 0 for _ in range(N, H * W)])
     img_HWhwc = img_nhwc.reshape(H, W, h, w, c)
     img_HhWwc = img_HWhwc.transpose(0, 2, 1, 3, 4)
-    img_Hh_Ww_c = img_HhWwc.reshape(H*h, W*w, c)
+    img_Hh_Ww_c = img_HhWwc.reshape(H * h, W * w, c)
     return img_Hh_Ww_c
 
+
 def get_shape_from_obs_space(obs_space):
-    if obs_space.__class__.__name__ == 'Box':
+    if obs_space.__class__.__name__ == "Box":
         obs_shape = obs_space.shape
-    elif obs_space.__class__.__name__ == 'list':
+    elif obs_space.__class__.__name__ == "list":
         obs_shape = obs_space
     else:
         raise NotImplementedError
     return obs_shape
 
+
 def get_shape_from_act_space(act_space):
-    if act_space.__class__.__name__ == 'Discrete':
+    if act_space.__class__.__name__ == "Discrete":
         act_shape = 1
     elif act_space.__class__.__name__ == "MultiDiscrete":
         act_shape = act_space.shape
@@ -342,5 +376,5 @@ def get_shape_from_act_space(act_space):
     elif act_space.__class__.__name__ == "MultiBinary":
         act_shape = act_space.shape[0]
     else:  # agar
-        act_shape = act_space[0].shape[0] + 1  
+        act_shape = act_space[0].shape[0] + 1
     return act_shape

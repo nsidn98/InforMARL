@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # physical/external base state of all entites
 class EntityState(object):
     def __init__(self):
@@ -8,12 +9,14 @@ class EntityState(object):
         # physical velocity
         self.p_vel = None
 
+
 # state of agents (including communication and internal/mental state)
 class AgentState(EntityState):
     def __init__(self):
         super(AgentState, self).__init__()
         # communication utterance
         self.c = None
+
 
 # action of the agent
 class Action(object):
@@ -23,10 +26,12 @@ class Action(object):
         # communication action
         self.c = None
 
+
 # properties of wall entities
 class Wall(object):
-    def __init__(self, orient='H', axis_pos=0.0, endpoints=(-1, 1), width=0.1,
-                hard=True):
+    def __init__(
+        self, orient="H", axis_pos=0.0, endpoints=(-1, 1), width=0.1, hard=True
+    ):
         # orientation: 'H'orizontal or 'V'ertical
         self.orient = orient
         # position along axis which wall lays on (y-axis for H, x-axis for V)
@@ -47,7 +52,7 @@ class Entity(object):
         # index among all entities (important to set for distance caching)
         self.i = 0
         # name
-        self.name = ''
+        self.name = ""
         # properties:
         self.size = 0.050
         # entity can move / be pushed
@@ -74,10 +79,12 @@ class Entity(object):
     def mass(self):
         return self.initial_mass
 
+
 # properties of landmark entities
 class Landmark(Entity):
     def __init__(self):
         super(Landmark, self).__init__()
+
 
 # properties of agent entities
 class Agent(Entity):
@@ -108,6 +115,7 @@ class Agent(Entity):
         # zoe 20200420
         self.goal = None
 
+
 # multi-agent world
 class World(object):
     def __init__(self):
@@ -126,7 +134,7 @@ class World(object):
         # physical damping（阻尼）
         self.damping = 0.25
         # contact response parameters
-        self.contact_force = 1e+2
+        self.contact_force = 1e2
         self.contact_margin = 1e-3
         # cache distances between all agents (not calculated by default)
         self.cache_dists = False
@@ -156,9 +164,9 @@ class World(object):
     def calculate_distances(self):
         if self.cached_dist_vect is None:
             # initialize distance data structure
-            self.cached_dist_vect = np.zeros((len(self.entities),
-                                            len(self.entities),
-                                            self.dim_p))
+            self.cached_dist_vect = np.zeros(
+                (len(self.entities), len(self.entities), self.dim_p)
+            )
             # calculate minimum distance for a collision between all entities （size相加�?
             self.min_dists = np.zeros((len(self.entities), len(self.entities)))
             for ia, entity_a in enumerate(self.entities):
@@ -177,7 +185,7 @@ class World(object):
 
         self.cached_dist_mag = np.linalg.norm(self.cached_dist_vect, axis=2)
 
-        self.cached_collisions = (self.cached_dist_mag <= self.min_dists)
+        self.cached_collisions = self.cached_dist_mag <= self.min_dists
 
     # update state of the world
     def step(self):
@@ -206,12 +214,15 @@ class World(object):
         # set applied forces
         for i, agent in enumerate(self.agents):
             if agent.movable:
-                noise = np.random.randn(
-                    *agent.action.u.shape) * agent.u_noise if agent.u_noise else 0.0
+                noise = (
+                    np.random.randn(*agent.action.u.shape) * agent.u_noise
+                    if agent.u_noise
+                    else 0.0
+                )
                 # force = mass * a * action + n
                 p_force[i] = (
-                    agent.mass * agent.accel if agent.accel is not None 
-                    else agent.mass) * agent.action.u + noise
+                    agent.mass * agent.accel if agent.accel is not None else agent.mass
+                ) * agent.action.u + noise
         return p_force
 
     # gather physical forces acting on entities
@@ -219,13 +230,16 @@ class World(object):
         # simple (but inefficient) collision response
         for a, entity_a in enumerate(self.entities):
             for b, entity_b in enumerate(self.entities):
-                if(b <= a): continue
+                if b <= a:
+                    continue
                 [f_a, f_b] = self.get_entity_collision_force(a, b)
-                if(f_a is not None):
-                    if(p_force[a] is None): p_force[a] = 0.0
+                if f_a is not None:
+                    if p_force[a] is None:
+                        p_force[a] = 0.0
                     p_force[a] = f_a + p_force[a]
-                if(f_b is not None):
-                    if(p_force[b] is None): p_force[b] = 0.0
+                if f_b is not None:
+                    if p_force[b] is None:
+                        p_force[b] = 0.0
                     p_force[b] = f_b + p_force[b]
             if entity_a.movable:
                 for wall in self.walls:
@@ -241,14 +255,21 @@ class World(object):
             if not entity.movable:
                 continue
             entity.state.p_vel = entity.state.p_vel * (1 - self.damping)
-            if (p_force[i] is not None):
+            if p_force[i] is not None:
                 entity.state.p_vel += (p_force[i] / entity.mass) * self.dt
             if entity.max_speed is not None:
-                speed = np.sqrt(np.square(entity.state.p_vel[0]) + 
-                                np.square(entity.state.p_vel[1]))
+                speed = np.sqrt(
+                    np.square(entity.state.p_vel[0]) + np.square(entity.state.p_vel[1])
+                )
                 if speed > entity.max_speed:
-                    entity.state.p_vel = entity.state.p_vel / np.sqrt(np.square(entity.state.p_vel[0]) +
-                                                                      np.square(entity.state.p_vel[1])) * entity.max_speed
+                    entity.state.p_vel = (
+                        entity.state.p_vel
+                        / np.sqrt(
+                            np.square(entity.state.p_vel[0])
+                            + np.square(entity.state.p_vel[1])
+                        )
+                        * entity.max_speed
+                    )
             entity.state.p_pos += entity.state.p_vel * self.dt
 
     def update_agent_state(self, agent):
@@ -256,8 +277,11 @@ class World(object):
         if agent.silent:
             agent.state.c = np.zeros(self.dim_c)
         else:
-            noise = np.random.randn(*agent.action.c.shape) * \
-                agent.c_noise if agent.c_noise else 0.0
+            noise = (
+                np.random.randn(*agent.action.c.shape) * agent.c_noise
+                if agent.c_noise
+                else 0.0
+            )
             agent.state.c = agent.action.c + noise
 
     # get collision forces for any contact between two entities
@@ -268,7 +292,7 @@ class World(object):
             return [None, None]  # not a collider
         if (not entity_a.movable) and (not entity_b.movable):
             return [None, None]  # neither entity moves
-        if (entity_a is entity_b):
+        if entity_a is entity_b:
             return [None, None]  # don't collide against itself
         if self.cache_dists:
             delta_pos = self.cached_dist_vect[ia, ib]
@@ -282,7 +306,7 @@ class World(object):
             dist_min = entity_a.size + entity_b.size
         # softmax penetration
         k = self.contact_margin
-        penetration = np.logaddexp(0, -(dist - dist_min)/k)*k
+        penetration = np.logaddexp(0, -(dist - dist_min) / k) * k
         force = self.contact_force * delta_pos / dist * penetration
         if entity_a.movable and entity_b.movable:
             # consider mass in collisions
@@ -298,18 +322,22 @@ class World(object):
     def get_wall_collision_force(self, entity, wall):
         if entity.ghost and not wall.hard:
             return None  # ghost passes through soft walls
-        if wall.orient == 'H':
+        if wall.orient == "H":
             prll_dim = 0
             perp_dim = 1
         else:
             prll_dim = 1
             perp_dim = 0
         ent_pos = entity.state.p_pos
-        if (ent_pos[prll_dim] < wall.endpoints[0] - entity.size or
-                ent_pos[prll_dim] > wall.endpoints[1] + entity.size):
+        if (
+            ent_pos[prll_dim] < wall.endpoints[0] - entity.size
+            or ent_pos[prll_dim] > wall.endpoints[1] + entity.size
+        ):
             return None  # entity is beyond endpoints of wall
-        elif (ent_pos[prll_dim] < wall.endpoints[0] or
-                ent_pos[prll_dim] > wall.endpoints[1]):
+        elif (
+            ent_pos[prll_dim] < wall.endpoints[0]
+            or ent_pos[prll_dim] > wall.endpoints[1]
+        ):
             # part of entity is beyond wall
             if ent_pos[prll_dim] < wall.endpoints[0]:
                 dist_past_end = ent_pos[prll_dim] - wall.endpoints[0]
@@ -327,7 +355,7 @@ class World(object):
         dist = np.abs(delta_pos)
         # softmax penetration
         k = self.contact_margin
-        penetration = np.logaddexp(0, -(dist - dist_min)/k)*k
+        penetration = np.logaddexp(0, -(dist - dist_min) / k) * k
         force_mag = self.contact_force * delta_pos / dist * penetration
         force = np.zeros(2)
         force[perp_dim] = np.cos(theta) * force_mag
@@ -336,10 +364,10 @@ class World(object):
 
     def assign_agent_colors(self):
         n_dummies = 0
-        if hasattr(self.agents[0], 'dummy'):
+        if hasattr(self.agents[0], "dummy"):
             n_dummies = len([a for a in self.agents if a.dummy])
         n_adversaries = 0
-        if hasattr(self.agents[0], 'adversary'):
+        if hasattr(self.agents[0], "adversary"):
             n_adversaries = len([a for a in self.agents if a.adversary])
         n_good_agents = len(self.agents) - n_adversaries - n_dummies
         # r g b

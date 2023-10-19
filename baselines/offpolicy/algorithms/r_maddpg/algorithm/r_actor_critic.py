@@ -4,6 +4,7 @@ from baselines.offpolicy.utils.util import init, to_torch
 from baselines.offpolicy.algorithms.utils.rnn import RNNBase
 from baselines.offpolicy.algorithms.utils.act import ACTLayer
 
+
 class R_MADDPG_Actor(nn.Module):
     """
     Actor network class for recurrent MADDPG/MATD3. Outputs actions given observations + rnn state.
@@ -13,6 +14,7 @@ class R_MADDPG_Actor(nn.Module):
     :param device: (torch.device) specifies the device to run on (cpu/gpu).
     :param take_prev_action: (bool) whether the previous action should be part of the network input.
     """
+
     def __init__(self, args, obs_dim, act_dim, device, take_prev_action=False):
         super(R_MADDPG_Actor, self).__init__()
         self._use_orthogonal = args.use_orthogonal
@@ -75,6 +77,7 @@ class R_MADDPG_Critic(nn.Module):
     :param device: (torch.device) specifies the device to run on (cpu/gpu).
     :param num_q_outs: (int) number of q values to output (1 for MADDPG, 2 for MATD3).
     """
+
     def __init__(self, args, central_obs_dim, central_act_dim, device, num_q_outs=1):
         super(R_MADDPG_Critic, self).__init__()
         self._use_orthogonal = args.use_orthogonal
@@ -87,11 +90,17 @@ class R_MADDPG_Critic(nn.Module):
 
         self.rnn = RNNBase(args, input_dim)
 
-        init_method = [nn.init.xavier_uniform_, nn.init.orthogonal_][self._use_orthogonal]
+        init_method = [nn.init.xavier_uniform_, nn.init.orthogonal_][
+            self._use_orthogonal
+        ]
+
         def init_(m):
             return init(m, init_method, lambda x: nn.init.constant_(x, 0))
-        self.q_outs = nn.ModuleList([init_(nn.Linear(self.hidden_size, 1)) for _ in range(self.num_q_outs)])
-        
+
+        self.q_outs = nn.ModuleList(
+            [init_(nn.Linear(self.hidden_size, 1)) for _ in range(self.num_q_outs)]
+        )
+
         self.to(device)
 
     def forward(self, central_obs, central_act, rnn_states):

@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from baselines.offpolicy.utils.util import init, to_torch
 
+
 class QMixer(nn.Module):
     """
     Computes total Q values given agent q values and global states.
@@ -31,7 +32,10 @@ class QMixer(nn.Module):
         else:
             self.num_mixer_q_inps = self.num_agents
 
-        init_method = [nn.init.xavier_uniform_, nn.init.orthogonal_][self._use_orthogonal]
+        init_method = [nn.init.xavier_uniform_, nn.init.orthogonal_][
+            self._use_orthogonal
+        ]
+
         def init_(m):
             return init(m, init_method, lambda x: nn.init.constant_(x, 0))
 
@@ -39,7 +43,11 @@ class QMixer(nn.Module):
         if args.hypernet_layers == 1:
             # each hypernet only has 1 layer to output the weights
             # hyper_w1 outputs weight matrix which is of dimension (hidden_layer_dim x N)
-            self.hyper_w1 = init_(nn.Linear(self.cent_obs_dim, self.num_mixer_q_inps * self.hidden_layer_dim))
+            self.hyper_w1 = init_(
+                nn.Linear(
+                    self.cent_obs_dim, self.num_mixer_q_inps * self.hidden_layer_dim
+                )
+            )
             # hyper_w2 outputs weight matrix which is of dimension (1 x hidden_layer_dim)
             self.hyper_w2 = init_(nn.Linear(self.cent_obs_dim, self.hidden_layer_dim))
         elif args.hypernet_layers == 2:
@@ -47,12 +55,17 @@ class QMixer(nn.Module):
             self.hyper_w1 = nn.Sequential(
                 init_(nn.Linear(self.cent_obs_dim, self.hypernet_hidden_dim)),
                 nn.ReLU(),
-                init_(nn.Linear(self.hypernet_hidden_dim, self.num_mixer_q_inps * self.hidden_layer_dim))
+                init_(
+                    nn.Linear(
+                        self.hypernet_hidden_dim,
+                        self.num_mixer_q_inps * self.hidden_layer_dim,
+                    )
+                ),
             )
             self.hyper_w2 = nn.Sequential(
                 init_(nn.Linear(self.cent_obs_dim, self.hypernet_hidden_dim)),
                 nn.ReLU(),
-                init_(nn.Linear(self.hypernet_hidden_dim, self.hidden_layer_dim))
+                init_(nn.Linear(self.hypernet_hidden_dim, self.hidden_layer_dim)),
             )
 
         # hyper_b1 outputs bias vector of dimension (1 x hidden_layer_dim)
@@ -61,17 +74,17 @@ class QMixer(nn.Module):
         self.hyper_b2 = nn.Sequential(
             init_(nn.Linear(self.cent_obs_dim, self.hypernet_hidden_dim)),
             nn.ReLU(),
-            init_(nn.Linear(self.hypernet_hidden_dim, 1))
+            init_(nn.Linear(self.hypernet_hidden_dim, 1)),
         )
         self.to(device)
 
     def forward(self, agent_q_inps, states):
         """
-         Computes Q_tot using the individual agent q values and global state.
-         :param agent_q_inps: (torch.Tensor) individual agent q values
-         :param states: (torch.Tensor) state input to the hypernetworks.
-         :return Q_tot: (torch.Tensor) computed Q_tot values
-         """
+        Computes Q_tot using the individual agent q values and global state.
+        :param agent_q_inps: (torch.Tensor) individual agent q values
+        :param states: (torch.Tensor) state input to the hypernetworks.
+        :return Q_tot: (torch.Tensor) computed Q_tot values
+        """
         agent_q_inps = to_torch(agent_q_inps).to(**self.tpdv)
         states = to_torch(states).to(**self.tpdv)
 

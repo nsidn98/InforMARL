@@ -4,13 +4,16 @@ import time
 
 from baselines.offpolicy.runner.mlp.base_runner import MlpRunner
 
+
 class SMACRunner(MlpRunner):
     def __init__(self, config):
         """Runner class for the StarcraftII (SMAC) environment. See parent class for more information."""
         super(SMACRunner, self).__init__(config)
         # fill replay buffer with random actions
         self.finish_first_train_reset = False
-        num_warmup_episodes = max((self.batch_size/self.episode_length, self.args.num_random_episodes))
+        num_warmup_episodes = max(
+            (self.batch_size / self.episode_length, self.args.num_random_episodes)
+        )
         self.warmup(num_warmup_episodes)
         self.start = time.time()
         self.log_clear()
@@ -21,18 +24,19 @@ class SMACRunner(MlpRunner):
         self.trainer.prep_rollout()
 
         eval_infos = {}
-        eval_infos['win_rate'] = []
-        eval_infos['average_step_rewards'] = []
+        eval_infos["win_rate"] = []
+        eval_infos["average_step_rewards"] = []
 
         for _ in range(self.args.num_eval_episodes):
-            env_info = self.collecter(explore=False, training_episode=False, warmup=False)
-            
+            env_info = self.collecter(
+                explore=False, training_episode=False, warmup=False
+            )
+
             for k, v in env_info.items():
                 eval_infos[k].append(v)
 
         self.log_env(eval_infos, suffix="eval_")
 
-    
     def collect_rollout(self, explore=True, training_episode=True, warmup=False):
         """
         Collect a rollout and store it in the buffer. All agents share a single policy. Do training steps when appropriate
@@ -42,7 +46,9 @@ class SMACRunner(MlpRunner):
 
         :return env_info: (dict) contains information about the rollout (total rewards, etc).
         """
-        assert self.share_policy, "SC2 does not support individual agent policies currently!"
+        assert (
+            self.share_policy
+        ), "SC2 does not support individual agent policies currently!"
         env_info = {}
         p_id = "policy_0"
         policy = self.policies[p_id]
@@ -82,21 +88,23 @@ class SMACRunner(MlpRunner):
             # get actions for all agents to step the env
             if warmup:
                 # completely random actions in pre-training warmup phase
-                acts_batch = policy.get_random_actions(
-                    obs_batch, avail_acts_batch)
+                acts_batch = policy.get_random_actions(obs_batch, avail_acts_batch)
             else:
                 # get actions with exploration noise (eps-greedy/Gaussian)
-                acts_batch, _ = policy.get_actions(obs_batch,
-                                                    avail_acts_batch,
-                                                    t_env=self.total_env_steps,
-                                                    explore=explore)
+                acts_batch, _ = policy.get_actions(
+                    obs_batch,
+                    avail_acts_batch,
+                    t_env=self.total_env_steps,
+                    explore=explore,
+                )
             if not isinstance(acts_batch, np.ndarray):
                 acts_batch = acts_batch.cpu().detach().numpy()
             env_acts = np.split(acts_batch, n_rollout_threads)
 
             # env step and store the relevant episode information
             next_obs, next_share_obs, rewards, dones, infos, next_avail_acts = env.step(
-                env_acts)
+                env_acts
+            )
 
             episode_rewards.append(rewards)
             dones_env = np.all(dones, axis=1)
@@ -105,13 +113,14 @@ class SMACRunner(MlpRunner):
                 next_obs, next_share_obs, next_avail_acts = env.reset()
 
             if not explore and np.any(dones_env):
-                assert n_rollout_threads == 1, (
-                    "only support one env for evaluation in smac domain.")
+                assert (
+                    n_rollout_threads == 1
+                ), "only support one env for evaluation in smac domain."
                 for i in range(n_rollout_threads):
-                    if 'won' in infos[i][0].keys():
-                        if infos[i][0]['won']:  # take one agent
-                            env_info['win_rate'] = 1 if infos[i][0]['won'] else 0
-                env_info['average_step_rewards'] = np.mean(episode_rewards)
+                    if "won" in infos[i][0].keys():
+                        if infos[i][0]["won"]:  # take one agent
+                            env_info["win_rate"] = 1 if infos[i][0]["won"] else 0
+                env_info["average_step_rewards"] = np.mean(episode_rewards)
                 return env_info
 
             step_obs[p_id] = obs
@@ -135,40 +144,51 @@ class SMACRunner(MlpRunner):
                 self.obs = obs
                 self.share_obs = share_obs
                 self.avail_acts = avail_acts
-                self.buffer.insert(n_rollout_threads,
-                                   step_obs,
-                                   step_share_obs,
-                                   step_acts,
-                                   step_rewards,
-                                   step_next_obs,
-                                   step_next_share_obs,
-                                   step_dones,
-                                   step_dones_env,
-                                   valid_transition,
-                                   step_avail_acts,
-                                   step_next_avail_acts)
+                self.buffer.insert(
+                    n_rollout_threads,
+                    step_obs,
+                    step_share_obs,
+                    step_acts,
+                    step_rewards,
+                    step_next_obs,
+                    step_next_share_obs,
+                    step_dones,
+                    step_dones_env,
+                    valid_transition,
+                    step_avail_acts,
+                    step_next_avail_acts,
+                )
             # train
             if training_episode:
                 self.total_env_steps += n_rollout_threads
-                if (self.last_train_T == 0 or ((self.total_env_steps - self.last_train_T) / self.train_interval) >= 1):
+                if (
+                    self.last_train_T == 0
+                    or (
+                        (self.total_env_steps - self.last_train_T) / self.train_interval
+                    )
+                    >= 1
+                ):
                     self.train()
                     self.total_train_steps += 1
                     self.last_train_T = self.total_env_steps
 
-        env_info['average_step_rewards'] = np.mean(episode_rewards)
+        env_info["average_step_rewards"] = np.mean(episode_rewards)
         return env_info
 
     def log(self):
         """See parent class."""
         end = time.time()
-        print("\n Env {} Map {} Algo {} Exp {} runs total num timesteps {}/{}, FPS {}. \n"
-              .format(self.env_name,
-                      self.args.map_name,
-                      self.algorithm_name,
-                      self.args.experiment_name,
-                      self.total_env_steps,
-                      self.num_env_steps,
-                      int(self.total_env_steps / (end - self.start))))
+        print(
+            "\n Env {} Map {} Algo {} Exp {} runs total num timesteps {}/{}, FPS {}. \n".format(
+                self.env_name,
+                self.args.map_name,
+                self.algorithm_name,
+                self.args.experiment_name,
+                self.total_env_steps,
+                self.num_env_steps,
+                int(self.total_env_steps / (end - self.start)),
+            )
+        )
         for p_id, train_info in zip(self.policy_ids, self.train_infos):
             self.log_train(p_id, train_info)
 
@@ -179,4 +199,4 @@ class SMACRunner(MlpRunner):
         """See parent class."""
         self.env_infos = {}
 
-        self.env_infos['average_step_rewards'] = []
+        self.env_infos["average_step_rewards"] = []

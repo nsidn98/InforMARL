@@ -3,8 +3,11 @@ from abc import ABC, abstractmethod
 
 class GraphMLPPolicy(ABC):
     """Abstract GraphMLP policy class. Computes actions given relevant information."""
+
     @abstractmethod
-    def get_actions(self, obs, node_obs, adj, agent_id, available_actions, t_env, explore):
+    def get_actions(
+        self, obs, node_obs, adj, agent_id, available_actions, t_env, explore
+    ):
         """
         Compute actions using the needed information.
         :param obs: (np.ndarray) Observations with which to compute actions.
@@ -26,7 +29,7 @@ class GraphMLPPolicy(ABC):
         :param prev_actions: (np.ndarray) Optionally use previous action to  compute actions.
 
         :return: (np.ndarray) random actions
-        NOTE: Since `obs` is only used to get the batch size, we do not need 
+        NOTE: Since `obs` is only used to get the batch size, we do not need
         node_obs, adj and agent_id.
         """
         raise NotImplementedError

@@ -5,6 +5,7 @@ from baselines.offpolicy.algorithms.utils.mlp import MLPBase
 from baselines.offpolicy.algorithms.utils.rnn import RNNBase
 from baselines.offpolicy.algorithms.utils.act import ACTLayer
 
+
 class AgentQFunction(nn.Module):
     """
     Individual agent q network (RNN).
@@ -13,6 +14,7 @@ class AgentQFunction(nn.Module):
     :param act_dim: (int) dimension of the action space
     :param device: (torch.Device) torch device on which to do computations
     """
+
     def __init__(self, args, input_dim, act_dim, device):
         super(AgentQFunction, self).__init__()
         self._use_orthogonal = args.use_orthogonal
@@ -27,7 +29,9 @@ class AgentQFunction(nn.Module):
         else:
             self.mlp = MLPBase(args, input_dim)
 
-        self.q = ACTLayer(act_dim, self.hidden_size, self._use_orthogonal, gain=self._gain)
+        self.q = ACTLayer(
+            act_dim, self.hidden_size, self._use_orthogonal, gain=self._gain
+        )
 
         self.to(device)
 
@@ -55,8 +59,8 @@ class AgentQFunction(nn.Module):
 
         inp = obs
 
-        if self._use_rnn_layer: 
-            rnn_outs, h_final = self.rnn(inp, rnn_states) 
+        if self._use_rnn_layer:
+            rnn_outs, h_final = self.rnn(inp, rnn_states)
         else:
             rnn_outs = self.mlp(inp)
             h_final = rnn_states[0, :, :]

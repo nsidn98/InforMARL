@@ -12,6 +12,7 @@ class VDNMixer(nn.Module):
     :param device: (torch.Device) torch device on which to do computations.
     :param multidiscrete_list: (list) list of each action dimension if action space is multidiscrete
     """
+
     def __init__(self, args, num_agents, cent_obs_dim, device, multidiscrete_list=None):
         """
         init mixer class

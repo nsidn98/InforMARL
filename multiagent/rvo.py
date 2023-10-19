@@ -3,17 +3,18 @@ import rvo2
 
 import matplotlib.pyplot as plt
 
+
 # keep angle between [-pi, pi]
 def wrap(angle):
     while angle >= np.pi:
-        angle -= 2*np.pi
+        angle -= 2 * np.pi
     while angle < -np.pi:
-        angle += 2*np.pi
+        angle += 2 * np.pi
     return angle
 
-class RVOPolicy():
+
+class RVOPolicy:
     def __init__(self):
-        
         sensing_horizon = np.inf
         max_num_agents_in_env = 19
         rvo_time_horizon = 2.5  # NOTE: bjorn used 1.0 in training for corl19
@@ -27,14 +28,19 @@ class RVOPolicy():
         self.has_fixed_speed = False
         self.heading_noise = False
 
-        self.max_delta_heading = np.pi/6
-        
+        self.max_delta_heading = np.pi / 6
+
         # TODO share this parameter with environment
         # Initialize RVO simulator
-        self.sim = rvo2.PyRVOSimulator(timeStep=self.dt, neighborDist=neighbor_dist, 
-            maxNeighbors=max_neighbors, timeHorizon=rvo_time_horizon, 
-            timeHorizonObst=rvo_time_horizon, radius=0.0, 
-            maxSpeed=0.0)
+        self.sim = rvo2.PyRVOSimulator(
+            timeStep=self.dt,
+            neighborDist=neighbor_dist,
+            maxNeighbors=max_neighbors,
+            timeHorizon=rvo_time_horizon,
+            timeHorizonObst=rvo_time_horizon,
+            radius=0.0,
+            maxSpeed=0.0,
+        )
 
         self.is_init = False
 
@@ -47,13 +53,13 @@ class RVOPolicy():
         self.goal_agents = np.empty((self.n_agents, state_dim))
         self.pref_vel_agents = np.empty((self.n_agents, state_dim))
         self.pref_speed_agents = np.empty((self.n_agents))
-        
-        self.rvo_agents = [None]*self.n_agents
+
+        self.rvo_agents = [None] * self.n_agents
 
         # Init simulation
         for a in range(self.n_agents):
-            self.rvo_agents[a] = self.sim.addAgent((0,0))
-        
+            self.rvo_agents[a] = self.sim.addAgent((0, 0))
+
         self.is_init = True
 
     # NOTE: Right now just supports multi-discrete actions
@@ -72,7 +78,7 @@ class RVOPolicy():
             if angle < 157.5 and angle >= 22.5:
                 action[4] = 1
             # activate down action
-            if angle >=-157.5 and angle < -22.5:
+            if angle >= -157.5 and angle < -22.5:
                 action[3] = 1
             # activate left action
             if angle >= 112.5 or angle < -112.5:
@@ -88,43 +94,61 @@ class RVOPolicy():
         # Share all agent positions and preferred velocities from environment with RVO simulator
         for a in range(self.n_agents):
             # Copy current agent positions, goal and preferred speeds into np arrays
-            self.pos_agents[a,:] = agents[a].state.p_pos
-            self.goal_agents[a,:] = world.get_entity('landmark', agents[a].id).state.p_pos
-            self.vel_agents[a,:] = agents[a].state.p_vel
+            self.pos_agents[a, :] = agents[a].state.p_pos
+            self.goal_agents[a, :] = world.get_entity(
+                "landmark", agents[a].id
+            ).state.p_pos
+            self.vel_agents[a, :] = agents[a].state.p_vel
             self.pref_speed_agents[a] = agents[a].pref_speed
 
             # Calculate preferred velocity
             # Assumes non RVO agents are acting like RVO agents
-            self.pref_vel_agents[a,:] = self.goal_agents[a,:] - self.pos_agents[a,:]
-            self.pref_vel_agents[a,:] = self.pref_speed_agents[a] / np.linalg.norm(self.pref_vel_agents[a,:]) * self.pref_vel_agents[a,:]
+            self.pref_vel_agents[a, :] = self.goal_agents[a, :] - self.pos_agents[a, :]
+            self.pref_vel_agents[a, :] = (
+                self.pref_speed_agents[a]
+                / np.linalg.norm(self.pref_vel_agents[a, :])
+                * self.pref_vel_agents[a, :]
+            )
 
             # Set agent positions and velocities in RVO simulator
             self.sim.setAgentMaxSpeed(self.rvo_agents[a], agents[a].pref_speed)
-            self.sim.setAgentRadius(self.rvo_agents[a], (1+5e-2)*agents[a].radius)
-            self.sim.setAgentPosition(self.rvo_agents[a], tuple(self.pos_agents[a,:]))
-            self.sim.setAgentVelocity(self.rvo_agents[a], tuple(self.vel_agents[a,:]))
-            self.sim.setAgentPrefVelocity(self.rvo_agents[a], tuple(self.pref_vel_agents[a,:]))
+            self.sim.setAgentRadius(self.rvo_agents[a], (1 + 5e-2) * agents[a].radius)
+            self.sim.setAgentPosition(self.rvo_agents[a], tuple(self.pos_agents[a, :]))
+            self.sim.setAgentVelocity(self.rvo_agents[a], tuple(self.vel_agents[a, :]))
+            self.sim.setAgentPrefVelocity(
+                self.rvo_agents[a], tuple(self.pref_vel_agents[a, :])
+            )
 
         # Set ego agent's collaborativity
         if self.rvo_collab_coeff < 0:
-            # agent is anti-collaborative ==> every X seconds, 
-            # it chooses btwn non-coop and adversarial, where the PMF of 
+            # agent is anti-collaborative ==> every X seconds,
+            # it chooses btwn non-coop and adversarial, where the PMF of
             # which policy to run is defined by abs(collab_coeff)\in(0,1].
 
             # if a certain freq, randomly select btwn use non coop policy vs. rvo
-            if round(agents[agent_index].t % self.rvo_anti_collab_t, 3) < self.dt or \
-                round(self.rvo_anti_collab_t - agents[agent_index].t % self.rvo_anti_collab_t, 3) < self.dt:
-                self.use_non_coop_policy = np.random.choice([True, False], 
-                                            p=[1-abs(self.rvo_collabb_coeff), 
-                                                abs(self.rvo_collabb_coeff)])
+            if (
+                round(agents[agent_index].t % self.rvo_anti_collab_t, 3) < self.dt
+                or round(
+                    self.rvo_anti_collab_t
+                    - agents[agent_index].t % self.rvo_anti_collab_t,
+                    3,
+                )
+                < self.dt
+            ):
+                self.use_non_coop_policy = np.random.choice(
+                    [True, False],
+                    p=[1 - abs(self.rvo_collabb_coeff), abs(self.rvo_collabb_coeff)],
+                )
             if self.use_non_coop_policy:
                 self.sim.setAgentCollabCoeff(self.rvo_agents[agent_index], 0.0)
             else:
-                self.sim.setAgentCollabCoeff(self.rvo_agents[agent_index], 
-                                            self.rvo_collabb_coeff)
+                self.sim.setAgentCollabCoeff(
+                    self.rvo_agents[agent_index], self.rvo_collabb_coeff
+                )
         else:
-            self.sim.setAgentCollabCoeff(self.rvo_agents[agent_index], 
-                                            self.rvo_collabb_coeff)
+            self.sim.setAgentCollabCoeff(
+                self.rvo_agents[agent_index], self.rvo_collabb_coeff
+            )
 
         # Execute one step in the RVO simulator
         self.sim.doStep()
@@ -132,7 +156,7 @@ class RVOPolicy():
         # Calculate desired change of heading
         self.new_rvo_pos = self.sim.getAgentPosition(self.rvo_agents[agent_index])[:]
         ########## process new pos to speed and angle ##########
-        deltaPos = self.new_rvo_pos - self.pos_agents[agent_index,:]
+        deltaPos = self.new_rvo_pos - self.pos_agents[agent_index, :]
         action = self.convert_to_action(delta_pos=deltaPos)
         # p1 = deltaPos
         # p2 = np.array([1,0]) # Angle zero is parallel to x-axis
@@ -140,7 +164,7 @@ class RVOPolicy():
         # ang2 = np.arctan2(*p2[::-1])
         # new_heading_global_frame = (ang1 - ang2) % (2 * np.pi)
         # delta_heading = wrap(new_heading_global_frame - agents[agent_index].heading_global_frame)
-            
+
         # # Calculate desired speed
         # pref_speed = 1/self.dt * np.linalg.norm(deltaPos)
 
@@ -159,5 +183,3 @@ class RVOPolicy():
 
         # action = np.array([pref_speed, delta_heading])
         return action
-
-    

@@ -36,54 +36,66 @@ class M_QMixer(nn.Module):
             self.num_mixer_q_inps = self.num_agents
 
         if self.use_orthogonal:
+
             def init_(m):
-                return init(m, nn.init.orthogonal_,
-                            lambda x: nn.init.constant_(x, 0))
+                return init(m, nn.init.orthogonal_, lambda x: nn.init.constant_(x, 0))
+
         else:
+
             def init_(m):
-                return init(m, nn.init.xavier_uniform_,
-                            lambda x: nn.init.constant_(x, 0))
+                return init(
+                    m, nn.init.xavier_uniform_, lambda x: nn.init.constant_(x, 0)
+                )
 
         # hypernets output the weight and bias for the 2 layer MLP which takes in the state and agent Qs and outputs Q_tot
         if args.hypernet_layers == 1:
             # each hypernet only has 1 layer to output the weights
             # hyper_w1 outputs weight matrix which is of dimension (hidden_layer_dim x N)
-            self.hyper_w1 = init_(nn.Linear(
-                self.cent_obs_dim, self.num_mixer_q_inps * self.hidden_layer_dim)).to(self.device)
+            self.hyper_w1 = init_(
+                nn.Linear(
+                    self.cent_obs_dim, self.num_mixer_q_inps * self.hidden_layer_dim
+                )
+            ).to(self.device)
             # hyper_w2 outputs weight matrix which is of dimension (1 x hidden_layer_dim)
             self.hyper_w2 = init_(
-                nn.Linear(self.cent_obs_dim, self.hidden_layer_dim)).to(self.device)
+                nn.Linear(self.cent_obs_dim, self.hidden_layer_dim)
+            ).to(self.device)
         elif args.hypernet_layers == 2:
             # 2 layer hypernets: output dimensions are same as above case
             self.hyper_w1 = nn.Sequential(
                 init_(nn.Linear(self.cent_obs_dim, self.hypernet_hidden_dim)),
                 nn.ReLU(),
-                init_(nn.Linear(self.hypernet_hidden_dim,
-                                self.num_mixer_q_inps * self.hidden_layer_dim))
+                init_(
+                    nn.Linear(
+                        self.hypernet_hidden_dim,
+                        self.num_mixer_q_inps * self.hidden_layer_dim,
+                    )
+                ),
             ).to(self.device)
             self.hyper_w2 = nn.Sequential(
                 init_(nn.Linear(self.cent_obs_dim, self.hypernet_hidden_dim)),
                 nn.ReLU(),
-                init_(nn.Linear(self.hypernet_hidden_dim, self.hidden_layer_dim))
+                init_(nn.Linear(self.hypernet_hidden_dim, self.hidden_layer_dim)),
             ).to(self.device)
 
         # hyper_b1 outputs bias vector of dimension (1 x hidden_layer_dim)
-        self.hyper_b1 = init_(
-            nn.Linear(self.cent_obs_dim, self.hidden_layer_dim)).to(self.device)
+        self.hyper_b1 = init_(nn.Linear(self.cent_obs_dim, self.hidden_layer_dim)).to(
+            self.device
+        )
         # hyper_b2 outptus bias vector of dimension (1 x 1)
         self.hyper_b2 = nn.Sequential(
             init_(nn.Linear(self.cent_obs_dim, self.hypernet_hidden_dim)),
             nn.ReLU(),
-            init_(nn.Linear(self.hypernet_hidden_dim, 1))
+            init_(nn.Linear(self.hypernet_hidden_dim, 1)),
         ).to(self.device)
 
     def forward(self, agent_q_inps, states):
         """
-         Computes Q_tot using the individual agent q values and global state.
-         :param agent_q_inps: (torch.Tensor) individual agent q values
-         :param states: (torch.Tensor) state input to the hypernetworks.
-         :return Q_tot: (torch.Tensor) computed Q_tot values
-         """
+        Computes Q_tot using the individual agent q values and global state.
+        :param agent_q_inps: (torch.Tensor) individual agent q values
+        :param states: (torch.Tensor) state input to the hypernetworks.
+        :return Q_tot: (torch.Tensor) computed Q_tot values
+        """
         if type(agent_q_inps) == np.ndarray:
             agent_q_inps = torch.FloatTensor(agent_q_inps)
         if type(states) == np.ndarray:

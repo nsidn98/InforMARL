@@ -8,15 +8,18 @@ from baselines.offpolicy.algorithms.base.trainer import Trainer
 from baselines.offpolicy.utils.popart import PopArt
 import numpy as np
 
+
 class QMix(Trainer):
-    def __init__(self, 
-                args:argparse.Namespace, 
-                num_agents:int, 
-                policies:dict, 
-                policy_mapping_fn, 
-                device:torch.device=torch.device("cuda:0"), 
-                episode_length:int=None, 
-                vdn:bool=False):
+    def __init__(
+        self,
+        args: argparse.Namespace,
+        num_agents: int,
+        policies: dict,
+        policy_mapping_fn,
+        device: torch.device = torch.device("cuda:0"),
+        episode_length: int = None,
+        vdn: bool = False,
+    ):
         """
         Trainer class for recurrent QMix/VDN. See parent class for more information.
         :param episode_length: (int) maximum length of an episode.
@@ -47,36 +50,57 @@ class QMix(Trainer):
         self.policy_mapping_fn = policy_mapping_fn
         self.policy_ids = sorted(list(self.policies.keys()))
         self.policy_agents = {
-            policy_id: sorted([agent_id for agent_id in range(self.num_agents) \
-            if self.policy_mapping_fn(agent_id) == policy_id])
-            for policy_id in self.policies.keys()}
+            policy_id: sorted(
+                [
+                    agent_id
+                    for agent_id in range(self.num_agents)
+                    if self.policy_mapping_fn(agent_id) == policy_id
+                ]
+            )
+            for policy_id in self.policies.keys()
+        }
         if self.use_popart:
-            self.value_normalizer = {policy_id: PopArt(1) for policy_id in self.policies.keys()}
+            self.value_normalizer = {
+                policy_id: PopArt(1) for policy_id in self.policies.keys()
+            }
 
         self.use_same_share_obs = self.args.use_same_share_obs
 
         multidiscrete_list = None
-        if any([isinstance(policy.act_dim, np.ndarray) for policy in self.policies.values()]):
+        if any(
+            [
+                isinstance(policy.act_dim, np.ndarray)
+                for policy in self.policies.values()
+            ]
+        ):
             # multidiscrete
-            multidiscrete_list = [len(self.policies[p_id].act_dim) *
-                                  len(self.policy_agents[p_id]) for p_id in self.policy_ids]
+            multidiscrete_list = [
+                len(self.policies[p_id].act_dim) * len(self.policy_agents[p_id])
+                for p_id in self.policy_ids
+            ]
 
         # mixer network
         if vdn:
-            self.mixer = VDNMixer(args, 
-                                self.num_agents, 
-                                self.policies['policy_0'].central_obs_dim, 
-                                self.device, 
-                                multidiscrete_list=multidiscrete_list)
+            self.mixer = VDNMixer(
+                args,
+                self.num_agents,
+                self.policies["policy_0"].central_obs_dim,
+                self.device,
+                multidiscrete_list=multidiscrete_list,
+            )
         else:
-            self.mixer = QMixer(args, 
-                            self.num_agents, 
-                            self.policies['policy_0'].central_obs_dim, 
-                            self.device, 
-                            multidiscrete_list=multidiscrete_list)
+            self.mixer = QMixer(
+                args,
+                self.num_agents,
+                self.policies["policy_0"].central_obs_dim,
+                self.device,
+                multidiscrete_list=multidiscrete_list,
+            )
 
         # target policies/networks
-        self.target_policies = {p_id: copy.deepcopy(self.policies[p_id]) for p_id in self.policy_ids}
+        self.target_policies = {
+            p_id: copy.deepcopy(self.policies[p_id]) for p_id in self.policy_ids
+        }
         self.target_mixer = copy.deepcopy(self.mixer)
 
         # collect all trainable parameters: each policy parameters, and the mixer parameters
@@ -85,7 +109,8 @@ class QMix(Trainer):
             self.parameters += policy.parameters()
         self.parameters += self.mixer.parameters()
         self.optimizer = torch.optim.Adam(
-            params=self.parameters, lr=self.lr, eps=self.opti_eps)
+            params=self.parameters, lr=self.lr, eps=self.opti_eps
+        )
 
         if self.args.use_double_q:
             print("double Q learning will be used")
@@ -93,17 +118,25 @@ class QMix(Trainer):
     def train_policy_on_batch(self, batch, update_policy_id=None):
         """See parent class."""
         # unpack the batch
-        obs_batch, cent_obs_batch, \
-        act_batch, rew_batch, \
-        dones_batch, dones_env_batch, \
-        avail_act_batch, \
-        importance_weights, idxes = batch
+        (
+            obs_batch,
+            cent_obs_batch,
+            act_batch,
+            rew_batch,
+            dones_batch,
+            dones_env_batch,
+            avail_act_batch,
+            importance_weights,
+            idxes,
+        ) = batch
 
         if self.use_same_share_obs:
             cent_obs_batch = to_torch(cent_obs_batch[self.policy_ids[0]])
         else:
             choose_agent_id = 0
-            cent_obs_batch = to_torch(cent_obs_batch[self.policy_ids[0]][choose_agent_id])
+            cent_obs_batch = to_torch(
+                cent_obs_batch[self.policy_ids[0]][choose_agent_id]
+            )
 
         dones_env_batch = to_torch(dones_env_batch[self.policy_ids[0]]).to(**self.tpdv)
 
@@ -134,40 +167,55 @@ class QMix(Trainer):
             batch_size = pol_obs_batch.shape[2]
             total_batch_size = batch_size * len(self.policy_agents[p_id])
 
-            sum_act_dim = int(sum(policy.act_dim)) if policy.multidiscrete else policy.act_dim
+            sum_act_dim = (
+                int(sum(policy.act_dim)) if policy.multidiscrete else policy.act_dim
+            )
 
-            pol_prev_act_buffer_seq = torch.cat((torch.zeros(1, total_batch_size, sum_act_dim).to(**self.tpdv),
-                                                 stacked_act_batch))
+            pol_prev_act_buffer_seq = torch.cat(
+                (
+                    torch.zeros(1, total_batch_size, sum_act_dim).to(**self.tpdv),
+                    stacked_act_batch,
+                )
+            )
 
             # sequence of q values for all possible actions
-            pol_all_q_seq, _ = policy.get_q_values(stacked_obs_batch, 
-                                                pol_prev_act_buffer_seq,
-                                                policy.init_hidden(-1, total_batch_size))
-            # get only the q values corresponding to actions taken in 
+            pol_all_q_seq, _ = policy.get_q_values(
+                stacked_obs_batch,
+                pol_prev_act_buffer_seq,
+                policy.init_hidden(-1, total_batch_size),
+            )
+            # get only the q values corresponding to actions taken in
             # action_batch. Ignore the last time dimension.
             if policy.multidiscrete:
                 pol_all_q_curr_seq = [q_seq[:-1] for q_seq in pol_all_q_seq]
-                pol_q_seq = policy.q_values_from_actions(pol_all_q_curr_seq, 
-                                                        stacked_act_batch)
+                pol_q_seq = policy.q_values_from_actions(
+                    pol_all_q_curr_seq, stacked_act_batch
+                )
             else:
-                pol_q_seq = policy.q_values_from_actions(pol_all_q_seq[:-1], 
-                                                        stacked_act_batch)
+                pol_q_seq = policy.q_values_from_actions(
+                    pol_all_q_seq[:-1], stacked_act_batch
+                )
             agent_q_out_sequence = pol_q_seq.split(split_size=batch_size, dim=-2)
             agent_q_seq.append(torch.cat(agent_q_out_sequence, dim=-1))
 
             with torch.no_grad():
                 if self.args.use_double_q:
                     # choose greedy actions from live, but get corresponding q values from target
-                    greedy_actions, _ = policy.actions_from_q(pol_all_q_seq, 
-                                        available_actions=stacked_avail_act_batch)
-                    target_q_seq, _ = target_policy.get_q_values(stacked_obs_batch, 
-                                        pol_prev_act_buffer_seq, 
-                                        target_policy.init_hidden(-1, total_batch_size), 
-                                        action_batch=greedy_actions)
+                    greedy_actions, _ = policy.actions_from_q(
+                        pol_all_q_seq, available_actions=stacked_avail_act_batch
+                    )
+                    target_q_seq, _ = target_policy.get_q_values(
+                        stacked_obs_batch,
+                        pol_prev_act_buffer_seq,
+                        target_policy.init_hidden(-1, total_batch_size),
+                        action_batch=greedy_actions,
+                    )
                 else:
-                    _, _, target_q_seq = target_policy.get_actions(stacked_obs_batch, 
-                                        pol_prev_act_buffer_seq, 
-                                        target_policy.init_hidden(-1, total_batch_size))
+                    _, _, target_q_seq = target_policy.get_actions(
+                        stacked_obs_batch,
+                        pol_prev_act_buffer_seq,
+                        target_policy.init_hidden(-1, total_batch_size),
+                    )
             # don't need the first Q values for next step
             target_q_seq = target_q_seq[1:]
             agent_nq_sequence = target_q_seq.split(split_size=batch_size, dim=-2)
@@ -179,16 +227,24 @@ class QMix(Trainer):
 
         # get curr step and next step Q_tot values using mixer
         Q_tot_seq = self.mixer(agent_q_seq, cent_obs_batch[:-1]).squeeze(-1)
-        next_step_Q_tot_seq = self.target_mixer(agent_nq_seq, cent_obs_batch[1:]).squeeze(-1)
+        next_step_Q_tot_seq = self.target_mixer(
+            agent_nq_seq, cent_obs_batch[1:]
+        ).squeeze(-1)
 
         # agents share reward
         rewards = to_torch(rew_batch[self.policy_ids[0]][0]).to(**self.tpdv)
         # form bad transition mask
-        bad_transitions_mask = torch.cat((torch.zeros(1, batch_size, 1).to(**self.tpdv), 
-                                dones_env_batch[:self.episode_length - 1, :, :]))
+        bad_transitions_mask = torch.cat(
+            (
+                torch.zeros(1, batch_size, 1).to(**self.tpdv),
+                dones_env_batch[: self.episode_length - 1, :, :],
+            )
+        )
 
         # bootstrapped targets
-        Q_tot_target_seq = rewards + (1 - dones_env_batch) * self.args.gamma * next_step_Q_tot_seq
+        Q_tot_target_seq = (
+            rewards + (1 - dones_env_batch) * self.args.gamma * next_step_Q_tot_seq
+        )
         # Bellman error and mask out invalid transitions
         error = (Q_tot_seq - Q_tot_target_seq.detach()) * (1 - bad_transitions_mask)
 
@@ -196,20 +252,27 @@ class QMix(Trainer):
             # Form updated priorities for prioritized experience replay using the Bellman error
             importance_weights = to_torch(importance_weights).to(**self.tpdv)
             if self.use_huber_loss:
-                per_batch_error = huber_loss(error, self.huber_delta).sum(dim=0).flatten()
+                per_batch_error = (
+                    huber_loss(error, self.huber_delta).sum(dim=0).flatten()
+                )
             else:
                 per_batch_error = mse_loss(error).sum(dim=0).flatten()
             importance_weight_error = per_batch_error * importance_weights
             loss = importance_weight_error.sum() / (1 - bad_transitions_mask).sum()
 
-            # new priorities are a combination of the maximum TD error 
+            # new priorities are a combination of the maximum TD error
             # across sequence and the mean TD error across sequence (see R2D2 paper)
             td_errors = error.abs().cpu().detach().numpy()
-            new_priorities = ((1 - self.args.per_nu) * td_errors.mean(axis=0) +
-                              self.args.per_nu * td_errors.max(axis=0)).flatten() + self.per_eps
+            new_priorities = (
+                (1 - self.args.per_nu) * td_errors.mean(axis=0)
+                + self.args.per_nu * td_errors.max(axis=0)
+            ).flatten() + self.per_eps
         else:
             if self.use_huber_loss:
-                loss = huber_loss(error, self.huber_delta).sum() / (1 - bad_transitions_mask).sum()
+                loss = (
+                    huber_loss(error, self.huber_delta).sum()
+                    / (1 - bad_transitions_mask).sum()
+                )
             else:
                 loss = mse_loss(error).sum() / (1 - bad_transitions_mask).sum()
             new_priorities = None
@@ -217,16 +280,17 @@ class QMix(Trainer):
         # backward pass and gradient step
         self.optimizer.zero_grad()
         loss.backward()
-        grad_norm = torch.nn.utils.clip_grad_norm_(self.parameters, self.args.max_grad_norm)
+        grad_norm = torch.nn.utils.clip_grad_norm_(
+            self.parameters, self.args.max_grad_norm
+        )
         self.optimizer.step()
         # log
         train_info = {}
-        train_info['loss'] = loss
-        train_info['grad_norm'] = grad_norm
-        train_info['Q_tot'] = (Q_tot_seq * (1 - bad_transitions_mask)).mean()
+        train_info["loss"] = loss
+        train_info["grad_norm"] = grad_norm
+        train_info["Q_tot"] = (Q_tot_seq * (1 - bad_transitions_mask)).mean()
 
         return train_info, new_priorities, idxes
-
 
     def hard_target_updates(self):
         """Hard update the target networks."""
@@ -239,7 +303,9 @@ class QMix(Trainer):
     def soft_target_updates(self):
         """Soft update the target networks."""
         for policy_id in self.policy_ids:
-            soft_update(self.target_policies[policy_id], self.policies[policy_id], self.tau)
+            soft_update(
+                self.target_policies[policy_id], self.policies[policy_id], self.tau
+            )
         if self.mixer is not None:
             soft_update(self.target_mixer, self.mixer, self.tau)
 

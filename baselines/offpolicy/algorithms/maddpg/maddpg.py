@@ -6,8 +6,17 @@ from baselines.offpolicy.utils.util import huber_loss, mse_loss, to_torch
 from baselines.offpolicy.utils.popart import PopArt
 from baselines.offpolicy.algorithms.base.trainer import Trainer
 
+
 class MADDPG(Trainer):
-    def __init__(self, args, num_agents, policies, policy_mapping_fn, device=None, actor_update_interval=1):
+    def __init__(
+        self,
+        args,
+        num_agents,
+        policies,
+        policy_mapping_fn,
+        device=None,
+        actor_update_interval=1,
+    ):
         """
         Trainer class for MADDPG. See parent class for more information.
         :param actor_update_interval: (int) number of critic updates to perform between every update to the actor.
@@ -25,17 +34,28 @@ class MADDPG(Trainer):
         self.policies = policies
         self.policy_mapping_fn = policy_mapping_fn
         self.policy_ids = sorted(list(self.policies.keys()))
-        self.policy_agents = {policy_id: sorted(
-            [agent_id for agent_id in range(self.num_agents) if self.policy_mapping_fn(agent_id) == policy_id]) for policy_id in
-            self.policies.keys()}
+        self.policy_agents = {
+            policy_id: sorted(
+                [
+                    agent_id
+                    for agent_id in range(self.num_agents)
+                    if self.policy_mapping_fn(agent_id) == policy_id
+                ]
+            )
+            for policy_id in self.policies.keys()
+        }
         if self.use_popart:
-            self.value_normalizer = {policy_id: PopArt(1) for policy_id in self.policies.keys()}
-        self.num_updates = {p_id : 0 for p_id in self.policy_ids}
+            self.value_normalizer = {
+                policy_id: PopArt(1) for policy_id in self.policies.keys()
+            }
+        self.num_updates = {p_id: 0 for p_id in self.policy_ids}
         self.use_same_share_obs = self.args.use_same_share_obs
         self.actor_update_interval = actor_update_interval
 
     # @profile
-    def get_update_info(self, update_policy_id, obs_batch, act_batch, nobs_batch, navail_act_batch):
+    def get_update_info(
+        self, update_policy_id, obs_batch, act_batch, nobs_batch, navail_act_batch
+    ):
         """
         Form centralized observation and action info for current and next timestep.
         :param update_policy_id: (str) id of policy being updated.
@@ -63,12 +83,16 @@ class MADDPG(Trainer):
 
             combined_nobs_batch = np.concatenate(nobs_batch[p_id], axis=0)
             if navail_act_batch[p_id] is not None:
-                combined_navail_act_batch = np.concatenate(navail_act_batch[p_id], axis=0)
+                combined_navail_act_batch = np.concatenate(
+                    navail_act_batch[p_id], axis=0
+                )
             else:
                 combined_navail_act_batch = None
             # use target actor to get next step actions
             with torch.no_grad():
-                pol_nact, _ = policy.get_actions(combined_nobs_batch, combined_navail_act_batch, use_target=True)
+                pol_nact, _ = policy.get_actions(
+                    combined_nobs_batch, combined_navail_act_batch, use_target=True
+                )
                 ind_agent_nacts = pol_nact.cpu().split(split_size=batch_size, dim=0)
             # cat to form the centralized next step actions
             cent_nact.append(torch.cat(ind_agent_nacts, dim=-1))
@@ -89,16 +113,29 @@ class MADDPG(Trainer):
 
     def shared_train_policy_on_batch(self, update_policy_id, batch):
         """Training function when all agents share the same centralized observation. See train_policy_on_batch."""
-        obs_batch, cent_obs_batch, \
-        act_batch, rew_batch, \
-        nobs_batch, cent_nobs_batch, \
-        dones_batch, dones_env_batch, valid_transition_batch,\
-        avail_act_batch, navail_act_batch, \
-        importance_weights, idxes = batch
+        (
+            obs_batch,
+            cent_obs_batch,
+            act_batch,
+            rew_batch,
+            nobs_batch,
+            cent_nobs_batch,
+            dones_batch,
+            dones_env_batch,
+            valid_transition_batch,
+            avail_act_batch,
+            navail_act_batch,
+            importance_weights,
+            idxes,
+        ) = batch
 
         train_info = {}
-        update_actor = self.num_updates[update_policy_id] % self.actor_update_interval == 0
-        cent_act, replace_ind_start, cent_nact = self.get_update_info(update_policy_id, obs_batch, act_batch, nobs_batch, navail_act_batch)
+        update_actor = (
+            self.num_updates[update_policy_id] % self.actor_update_interval == 0
+        )
+        cent_act, replace_ind_start, cent_nact = self.get_update_info(
+            update_policy_id, obs_batch, act_batch, nobs_batch, navail_act_batch
+        )
 
         cent_obs = cent_obs_batch[update_policy_id]
         cent_nobs = cent_nobs_batch[update_policy_id]
@@ -120,7 +157,9 @@ class MADDPG(Trainer):
         dones_env = to_torch(dones_env).to(**self.tpdv).view(-1, 1)
 
         if self.use_popart:
-            target_Qs = rewards + self.args.gamma * (1 - dones_env) * self.value_normalizer[p_id].denormalize(next_step_Q)
+            target_Qs = rewards + self.args.gamma * (
+                1 - dones_env
+            ) * self.value_normalizer[p_id].denormalize(next_step_Q)
             target_Qs = self.value_normalizer[p_id](target_Qs)
         else:
             target_Qs = rewards + self.args.gamma * (1 - dones_env) * next_step_Q
@@ -134,17 +173,26 @@ class MADDPG(Trainer):
         if self.use_per:
             importance_weights = to_torch(importance_weights).to(**self.tpdv)
             if self.use_huber_loss:
-                critic_loss = [huber_loss(error, self.huber_delta).flatten() for error in errors]
+                critic_loss = [
+                    huber_loss(error, self.huber_delta).flatten() for error in errors
+                ]
             else:
                 critic_loss = [mse_loss(error).flatten() for error in errors]
             # weight each loss element by their importance sample weight
             critic_loss = [(loss * importance_weights).mean() for loss in critic_loss]
             critic_loss = torch.stack(critic_loss).sum(dim=0)
             # new priorities are TD error
-            new_priorities = np.stack([error.abs().cpu().detach().numpy().flatten() for error in errors]).mean(axis=0) + self.per_eps
+            new_priorities = (
+                np.stack(
+                    [error.abs().cpu().detach().numpy().flatten() for error in errors]
+                ).mean(axis=0)
+                + self.per_eps
+            )
         else:
             if self.use_huber_loss:
-                critic_loss = [huber_loss(error, self.huber_delta).mean() for error in errors]
+                critic_loss = [
+                    huber_loss(error, self.huber_delta).mean() for error in errors
+                ]
             else:
                 critic_loss = [mse_loss(error).mean() for error in errors]
             critic_loss = torch.stack(critic_loss).sum(dim=0)
@@ -152,12 +200,13 @@ class MADDPG(Trainer):
 
         critic_loss.backward()
 
-        critic_grad_norm = torch.nn.utils.clip_grad_norm_(update_policy.critic.parameters(),
-                                                                 self.args.max_grad_norm)
+        critic_grad_norm = torch.nn.utils.clip_grad_norm_(
+            update_policy.critic.parameters(), self.args.max_grad_norm
+        )
         update_policy.critic_optimizer.step()
 
-        train_info['critic_loss'] = critic_loss
-        train_info['critic_grad_norm'] = critic_grad_norm
+        train_info["critic_loss"] = critic_loss
+        train_info["critic_grad_norm"] = critic_grad_norm
 
         if update_actor:
             # actor update
@@ -188,25 +237,33 @@ class MADDPG(Trainer):
                     sum_act_dim = int(sum(update_policy.act_dim))
                 else:
                     sum_act_dim = update_policy.act_dim
-                curr_mask_temp[replace_ind_start + i] = np.ones(sum_act_dim, dtype=np.float32)
+                curr_mask_temp[replace_ind_start + i] = np.ones(
+                    sum_act_dim, dtype=np.float32
+                )
                 curr_mask_vec = np.concatenate(curr_mask_temp)
                 # expand this mask into the proper size
                 curr_mask = np.tile(curr_mask_vec, (batch_size, 1))
                 masks.append(curr_mask)
 
                 # agent valid transitions
-                agent_valid_trans_batch = to_torch(valid_transition_batch[update_policy_id][i]).to(**self.tpdv)
+                agent_valid_trans_batch = to_torch(
+                    valid_transition_batch[update_policy_id][i]
+                ).to(**self.tpdv)
                 valid_trans_mask.append(agent_valid_trans_batch)
             # cat to form into tensors
             mask = to_torch(np.concatenate(masks)).to(**self.tpdv)
             valid_trans_mask = torch.cat(valid_trans_mask, dim=0)
             pol_agents_obs_batch = np.concatenate(obs_batch[update_policy_id], axis=0)
             if avail_act_batch[update_policy_id] is not None:
-                pol_agents_avail_act_batch = np.concatenate(avail_act_batch[update_policy_id], axis=0)
+                pol_agents_avail_act_batch = np.concatenate(
+                    avail_act_batch[update_policy_id], axis=0
+                )
             else:
                 pol_agents_avail_act_batch = None
             # get all actions from actor
-            pol_acts, _ = update_policy.get_actions(pol_agents_obs_batch, pol_agents_avail_act_batch, use_gumbel=True)
+            pol_acts, _ = update_policy.get_actions(
+                pol_agents_obs_batch, pol_agents_avail_act_batch, use_gumbel=True
+            )
             # separate into individual agent batches
             agent_actor_batches = pol_acts.split(split_size=batch_size, dim=0)
 
@@ -216,7 +273,9 @@ class MADDPG(Trainer):
             for i in range(num_update_agents):
                 actor_cent_acts[replace_ind_start + i] = agent_actor_batches[i]
 
-            actor_cent_acts = torch.cat(actor_cent_acts, dim=-1).repeat((num_update_agents, 1))
+            actor_cent_acts = torch.cat(actor_cent_acts, dim=-1).repeat(
+                (num_update_agents, 1)
+            )
             # convert buffer acts to torch, formulate centralized buffer action and repeat as done above
             buffer_cent_acts = torch.cat(cent_act, dim=-1).repeat(num_update_agents, 1)
 
@@ -224,7 +283,9 @@ class MADDPG(Trainer):
             stacked_cent_obs = np.tile(cent_obs, (num_update_agents, 1))
 
             # combine the buffer cent acts with actor cent acts and pass into buffer
-            actor_update_cent_acts = mask * actor_cent_acts + (1 - mask) * buffer_cent_acts
+            actor_update_cent_acts = (
+                mask * actor_cent_acts + (1 - mask) * buffer_cent_acts
+            )
             actor_Qs = update_policy.critic(stacked_cent_obs, actor_update_cent_acts)
             # use only the first Q output for actor loss
             actor_Qs = actor_Qs[0]
@@ -235,34 +296,47 @@ class MADDPG(Trainer):
             update_policy.actor_optimizer.zero_grad()
             actor_loss.backward()
 
-            actor_grad_norm = torch.nn.utils.clip_grad_norm_(update_policy.actor.parameters(),
-                                                                    self.args.max_grad_norm)
+            actor_grad_norm = torch.nn.utils.clip_grad_norm_(
+                update_policy.actor.parameters(), self.args.max_grad_norm
+            )
             update_policy.actor_optimizer.step()
 
             for p in update_policy.critic.parameters():
                 p.requires_grad = True
 
-            train_info['actor_loss'] = actor_loss
-            train_info['actor_grad_norm'] = actor_grad_norm
-            train_info['update_actor'] = update_actor
+            train_info["actor_loss"] = actor_loss
+            train_info["actor_grad_norm"] = actor_grad_norm
+            train_info["update_actor"] = update_actor
 
         return train_info, new_priorities, idxes
 
     def cent_train_policy_on_batch(self, update_policy_id, batch):
         """Training function when each agent has its own centralized observation. See train_policy_on_batch."""
-        obs_batch, cent_obs_batch, \
-        act_batch, rew_batch, \
-        nobs_batch, cent_nobs_batch, \
-        dones_batch, dones_env_batch, valid_transition_batch,\
-        avail_act_batch, navail_act_batch, \
-        importance_weights, idxes = batch
+        (
+            obs_batch,
+            cent_obs_batch,
+            act_batch,
+            rew_batch,
+            nobs_batch,
+            cent_nobs_batch,
+            dones_batch,
+            dones_env_batch,
+            valid_transition_batch,
+            avail_act_batch,
+            navail_act_batch,
+            importance_weights,
+            idxes,
+        ) = batch
 
         train_info = {}
 
-        update_actor = self.num_updates[update_policy_id] % self.actor_update_interval == 0
+        update_actor = (
+            self.num_updates[update_policy_id] % self.actor_update_interval == 0
+        )
 
         cent_act, replace_ind_start, cent_nact = self.get_update_info(
-            update_policy_id, obs_batch, act_batch, nobs_batch, navail_act_batch)
+            update_policy_id, obs_batch, act_batch, nobs_batch, navail_act_batch
+        )
 
         cent_obs = cent_obs_batch[update_policy_id]
         cent_nobs = cent_nobs_batch[update_policy_id]
@@ -292,19 +366,28 @@ class MADDPG(Trainer):
         all_agent_valid_trans = to_torch(valid_trans).to(**self.tpdv).reshape(-1, 1)
         # critic update
         with torch.no_grad():
-            next_step_Q = update_policy.target_critic(all_agent_cent_nobs, all_agent_cent_nact).reshape(-1, 1)
+            next_step_Q = update_policy.target_critic(
+                all_agent_cent_nobs, all_agent_cent_nact
+            ).reshape(-1, 1)
         if self.use_popart:
-            target_Qs = all_agent_rewards + self.args.gamma * (1 - all_env_dones) * \
-                self.value_normalizer[p_id].denormalize(next_step_Q)
+            target_Qs = all_agent_rewards + self.args.gamma * (
+                1 - all_env_dones
+            ) * self.value_normalizer[p_id].denormalize(next_step_Q)
             target_Qs = self.value_normalizer[p_id](target_Qs)
         else:
-            target_Qs = all_agent_rewards + self.args.gamma * (1 - all_env_dones) * next_step_Q
-        predicted_Qs = update_policy.critic(all_agent_cent_obs, all_agent_cent_act_buffer).reshape(-1, 1)
+            target_Qs = (
+                all_agent_rewards + self.args.gamma * (1 - all_env_dones) * next_step_Q
+            )
+        predicted_Qs = update_policy.critic(
+            all_agent_cent_obs, all_agent_cent_act_buffer
+        ).reshape(-1, 1)
 
         error = target_Qs.detach() - predicted_Qs
         if self.use_per:
             agent_importance_weights = np.tile(importance_weights, num_update_agents)
-            agent_importance_weights = to_torch(agent_importance_weights).to(**self.tpdv)
+            agent_importance_weights = to_torch(agent_importance_weights).to(
+                **self.tpdv
+            )
             if self.use_huber_loss:
                 critic_loss = huber_loss(error, self.huber_delta).flatten()
             else:
@@ -312,12 +395,17 @@ class MADDPG(Trainer):
             # weight each loss element by their importance sample weight
             critic_loss = critic_loss * agent_importance_weights
             if self.use_value_active_masks:
-                critic_loss = (critic_loss.view(-1, 1) * (all_agent_valid_trans)).sum() / (all_agent_valid_trans).sum()
+                critic_loss = (
+                    critic_loss.view(-1, 1) * (all_agent_valid_trans)
+                ).sum() / (all_agent_valid_trans).sum()
             else:
                 critic_loss = critic_loss.mean()
             # new priorities are TD error
             agent_new_priorities = error.abs().cpu().detach().numpy().flatten()
-            new_priorities = np.mean(np.split(agent_new_priorities, num_update_agents), axis=0) + self.per_eps
+            new_priorities = (
+                np.mean(np.split(agent_new_priorities, num_update_agents), axis=0)
+                + self.per_eps
+            )
         else:
             if self.use_huber_loss:
                 critic_loss = huber_loss(error, self.huber_delta)
@@ -325,18 +413,21 @@ class MADDPG(Trainer):
                 critic_loss = mse_loss(error)
 
             if self.use_value_active_masks:
-                critic_loss = (critic_loss * (all_agent_valid_trans)).sum() / (all_agent_valid_trans).sum()
+                critic_loss = (critic_loss * (all_agent_valid_trans)).sum() / (
+                    all_agent_valid_trans
+                ).sum()
             else:
                 critic_loss = critic_loss.mean()
             new_priorities = None
 
         critic_loss.backward()
-        critic_grad_norm = torch.nn.utils.clip_grad_norm_(update_policy.critic.parameters(),
-                                                                 self.args.max_grad_norm)
+        critic_grad_norm = torch.nn.utils.clip_grad_norm_(
+            update_policy.critic.parameters(), self.args.max_grad_norm
+        )
         update_policy.critic_optimizer.step()
 
-        train_info['critic_loss'] = critic_loss
-        train_info['critic_grad_norm'] = critic_grad_norm
+        train_info["critic_loss"] = critic_loss
+        train_info["critic_grad_norm"] = critic_grad_norm
 
         # actor update
         if update_actor:
@@ -365,14 +456,18 @@ class MADDPG(Trainer):
                     sum_act_dim = int(sum(update_policy.act_dim))
                 else:
                     sum_act_dim = update_policy.act_dim
-                curr_mask_temp[replace_ind_start + i] = np.ones(sum_act_dim, dtype=np.float32)
+                curr_mask_temp[replace_ind_start + i] = np.ones(
+                    sum_act_dim, dtype=np.float32
+                )
                 curr_mask_vec = np.concatenate(curr_mask_temp)
                 # expand this mask into the proper size
                 curr_mask = np.tile(curr_mask_vec, (batch_size, 1))
                 masks.append(curr_mask)
 
                 # agent valid transitions
-                agent_valid_trans_batch = to_torch(valid_transition_batch[update_policy_id][i]).to(**self.tpdv)
+                agent_valid_trans_batch = to_torch(
+                    valid_transition_batch[update_policy_id][i]
+                ).to(**self.tpdv)
                 valid_trans_mask.append(agent_valid_trans_batch)
             # cat to form into tensors
             mask = to_torch(np.concatenate(masks)).to(**self.tpdv)
@@ -380,11 +475,15 @@ class MADDPG(Trainer):
 
             pol_agents_obs_batch = np.concatenate(obs_batch[update_policy_id], axis=0)
             if avail_act_batch[update_policy_id] is not None:
-                pol_agents_avail_act_batch = np.concatenate(avail_act_batch[update_policy_id], axis=0)
+                pol_agents_avail_act_batch = np.concatenate(
+                    avail_act_batch[update_policy_id], axis=0
+                )
             else:
                 pol_agents_avail_act_batch = None
             # get all actions from actor
-            pol_acts, _ = update_policy.get_actions(pol_agents_obs_batch, pol_agents_avail_act_batch, use_gumbel=True)
+            pol_acts, _ = update_policy.get_actions(
+                pol_agents_obs_batch, pol_agents_avail_act_batch, use_gumbel=True
+            )
             # separate into individual agent batches
             agent_actor_batches = pol_acts.split(split_size=batch_size, dim=0)
             # cat along final dim to formulate centralized action and stack copies of the batch
@@ -393,10 +492,14 @@ class MADDPG(Trainer):
             for i in range(num_update_agents):
                 actor_cent_acts[replace_ind_start + i] = agent_actor_batches[i]
 
-            actor_cent_acts = torch.cat(actor_cent_acts, dim=-1).repeat((num_update_agents, 1))
+            actor_cent_acts = torch.cat(actor_cent_acts, dim=-1).repeat(
+                (num_update_agents, 1)
+            )
 
             # combine the buffer cent acts with actor cent acts and pass into buffer
-            actor_update_cent_acts = mask * actor_cent_acts + (1 - mask) * to_torch(all_agent_cent_act_buffer).to(**self.tpdv)
+            actor_update_cent_acts = mask * actor_cent_acts + (1 - mask) * to_torch(
+                all_agent_cent_act_buffer
+            ).to(**self.tpdv)
             actor_Qs = update_policy.critic(all_agent_cent_obs, actor_update_cent_acts)
             # actor_loss = -actor_Qs.mean()
             actor_Qs = actor_Qs * valid_trans_mask
@@ -406,15 +509,16 @@ class MADDPG(Trainer):
             update_policy.actor_optimizer.zero_grad()
             actor_loss.backward()
 
-            actor_grad_norm = torch.nn.utils.clip_grad_norm_(update_policy.actor.parameters(),
-                                                                    self.args.max_grad_norm)
+            actor_grad_norm = torch.nn.utils.clip_grad_norm_(
+                update_policy.actor.parameters(), self.args.max_grad_norm
+            )
             update_policy.actor_optimizer.step()
 
             for p in update_policy.critic.parameters():
                 p.requires_grad = True
 
-            train_info['actor_loss'] = actor_loss
-            train_info['actor_grad_norm'] = actor_grad_norm
+            train_info["actor_loss"] = actor_loss
+            train_info["actor_grad_norm"] = actor_grad_norm
 
         return train_info, new_priorities, idxes
 

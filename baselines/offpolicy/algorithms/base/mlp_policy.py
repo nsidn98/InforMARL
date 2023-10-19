@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 class MLPPolicy(ABC):
     """Abstract MLP policy class. Computes actions given relevant information."""
+
     @abstractmethod
     def get_actions(self, obs, available_actions, t_env, explore):
         """

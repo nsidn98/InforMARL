@@ -13,11 +13,10 @@ class Scenario(BaseScenario):
         world.collaborative = True
         # add agents
         world.num_agents = args.num_agents  # 2
-        assert world.num_agents == 2, (
-            "only 2 agents is supported, check the config.py.")
+        assert world.num_agents == 2, "only 2 agents is supported, check the config.py."
         world.agents = [Agent() for i in range(world.num_agents)]
         for i, agent in enumerate(world.agents):
-            agent.name = 'agent %d' % i
+            agent.name = "agent %d" % i
             agent.collide = False
             agent.size = 0.075
         # speaker
@@ -27,7 +26,7 @@ class Scenario(BaseScenario):
         # add landmarks
         world.landmarks = [Landmark() for i in range(world.num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
-            landmark.name = 'landmark %d' % i
+            landmark.name = "landmark %d" % i
             landmark.collide = False
             landmark.movable = False
             landmark.size = 0.04
@@ -51,8 +50,9 @@ class Scenario(BaseScenario):
         world.landmarks[1].color = np.array([0.15, 0.65, 0.15])
         world.landmarks[2].color = np.array([0.15, 0.15, 0.65])
         # special colors for goals
-        world.agents[0].goal_a.color = world.agents[0].goal_b.color + \
-            np.array([0.45, 0.45, 0.45])
+        world.agents[0].goal_a.color = world.agents[0].goal_b.color + np.array(
+            [0.45, 0.45, 0.45]
+        )
         # set random initial states
         for agent in world.agents:
             agent.state.p_pos = np.random.uniform(-1, +1, world.dim_p)

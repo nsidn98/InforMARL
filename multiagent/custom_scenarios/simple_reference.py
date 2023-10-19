@@ -9,6 +9,7 @@
 import argparse
 import numpy as np
 import os, sys
+
 sys.path.append(os.path.abspath(os.getcwd()))
 
 from multiagent.core import World, Agent, Landmark
@@ -16,7 +17,7 @@ from multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
-    def make_world(self, args:argparse.Namespace):
+    def make_world(self, args: argparse.Namespace):
         world = World()
         # set any world properties first
         world.world_length = args.episode_length
@@ -25,11 +26,10 @@ class Scenario(BaseScenario):
         world.collaborative = True  # whether agents share rewards
         # add agents
         world.num_agents = args.num_agents  # 2
-        assert world.num_agents == 2, (
-            "only 2 agents is supported, check the config.py.")
+        assert world.num_agents == 2, "only 2 agents is supported, check the config.py."
         world.agents = [Agent() for i in range(world.num_agents)]
         for i, agent in enumerate(world.agents):
-            agent.name = 'agent %d' % i
+            agent.name = "agent %d" % i
             agent.collide = False
             # agent.u_noise = 1e-1
             # agent.c_noise = 1e-1
@@ -37,7 +37,7 @@ class Scenario(BaseScenario):
         world.num_landmarks = args.num_landmarks  # 3
         world.landmarks = [Landmark() for i in range(world.num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
-            landmark.name = 'landmark %d' % i
+            landmark.name = "landmark %d" % i
             landmark.collide = False
             landmark.movable = False
         # make initial conditions
@@ -76,8 +76,7 @@ class Scenario(BaseScenario):
     def reward(self, agent, world):
         if agent.goal_a is None or agent.goal_b is None:
             return 0.0
-        dist2 = np.sum(
-            np.square(agent.goal_a.state.p_pos - agent.goal_b.state.p_pos))
+        dist2 = np.sum(np.square(agent.goal_a.state.p_pos - agent.goal_b.state.p_pos))
         return -dist2  # np.exp(-dist2)
 
     def observation(self, agent, world):
@@ -110,17 +109,18 @@ class Scenario(BaseScenario):
             comm.append(other.state.c)
         return np.concatenate([agent.state.p_vel] + entity_pos + [goal_color[1]] + comm)
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     from multiagent.environment import MultiAgentOrigEnv
     from multiagent.policy import InteractivePolicy
 
     # makeshift argparser
     class Args:
         def __init__(self):
-            self.num_agents:int=2
-            self.episode_length:int=25
-            self.num_landmarks:int=3
+            self.num_agents: int = 2
+            self.episode_length: int = 25
+            self.num_landmarks: int = 3
+
     args = Args()
 
     scenario = Scenario()
@@ -128,18 +128,21 @@ if __name__ == "__main__":
     # create world
     world = scenario.make_world(args)
     # create multiagent environment
-    env = MultiAgentOrigEnv(world=world, reset_callback=scenario.reset_world, 
-                        reward_callback=scenario.reward, 
-                        observation_callback=scenario.observation, 
-                        done_callback= scenario.done if hasattr(scenario, 'done') else None,
-                        shared_viewer = False)
+    env = MultiAgentOrigEnv(
+        world=world,
+        reset_callback=scenario.reset_world,
+        reward_callback=scenario.reward,
+        observation_callback=scenario.observation,
+        done_callback=scenario.done if hasattr(scenario, "done") else None,
+        shared_viewer=False,
+    )
     # render call to create viewer window
     env.render()
     # create interactive policies for each agent
-    policies = [InteractivePolicy(env,i) for i in range(env.n)]
+    policies = [InteractivePolicy(env, i) for i in range(env.n)]
     # execution loop
     obs_n = env.reset()
-    stp=0
+    stp = 0
     while True:
         # query for action from each agent's policy
         act_n = []
@@ -149,4 +152,4 @@ if __name__ == "__main__":
         obs_n, reward_n, done_n, info_n = env.step(act_n)
         # render all agent views
         env.render()
-        stp+=1
+        stp += 1

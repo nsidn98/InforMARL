@@ -8,8 +8,16 @@ def _cast(x):
 
 
 class RecReplayBuffer(object):
-    def __init__(self, policy_info, policy_agents, buffer_size, episode_length, use_same_share_obs, use_avail_acts,
-                 use_reward_normalization=False):
+    def __init__(
+        self,
+        policy_info,
+        policy_agents,
+        buffer_size,
+        episode_length,
+        use_same_share_obs,
+        use_avail_acts,
+        use_reward_normalization=False,
+    ):
         """
         Replay buffer class for training RNN policies. Stores entire episodes rather than single transitions.
 
@@ -22,21 +30,35 @@ class RecReplayBuffer(object):
         """
         self.policy_info = policy_info
 
-        self.policy_buffers = {p_id: RecPolicyBuffer(buffer_size,
-                                                     episode_length,
-                                                     len(policy_agents[p_id]),
-                                                     self.policy_info[p_id]['obs_space'],
-                                                     self.policy_info[p_id]['share_obs_space'],
-                                                     self.policy_info[p_id]['act_space'],
-                                                     use_same_share_obs,
-                                                     use_avail_acts,
-                                                     use_reward_normalization)
-                               for p_id in self.policy_info.keys()}
+        self.policy_buffers = {
+            p_id: RecPolicyBuffer(
+                buffer_size,
+                episode_length,
+                len(policy_agents[p_id]),
+                self.policy_info[p_id]["obs_space"],
+                self.policy_info[p_id]["share_obs_space"],
+                self.policy_info[p_id]["act_space"],
+                use_same_share_obs,
+                use_avail_acts,
+                use_reward_normalization,
+            )
+            for p_id in self.policy_info.keys()
+        }
 
     def __len__(self):
-        return self.policy_buffers['policy_0'].filled_i
+        return self.policy_buffers["policy_0"].filled_i
 
-    def insert(self, num_insert_episodes, obs, share_obs, acts, rewards, dones, dones_env, avail_acts):
+    def insert(
+        self,
+        num_insert_episodes,
+        obs,
+        share_obs,
+        acts,
+        rewards,
+        dones,
+        dones_env,
+        avail_acts,
+    ):
         """
         Insert a set of episodes into buffer. If the buffer size overflows, old episodes are dropped.
 
@@ -53,10 +75,16 @@ class RecReplayBuffer(object):
         :return: (np.ndarray) indexes in which the new transitions were placed.
         """
         for p_id in self.policy_info.keys():
-            idx_range = self.policy_buffers[p_id].insert(num_insert_episodes, np.array(obs[p_id]),
-                                                         np.array(share_obs[p_id]), np.array(acts[p_id]),
-                                                         np.array(rewards[p_id]), np.array(dones[p_id]),
-                                                         np.array(dones_env[p_id]), np.array(avail_acts[p_id]))
+            idx_range = self.policy_buffers[p_id].insert(
+                num_insert_episodes,
+                np.array(obs[p_id]),
+                np.array(share_obs[p_id]),
+                np.array(acts[p_id]),
+                np.array(rewards[p_id]),
+                np.array(dones[p_id]),
+                np.array(dones_env[p_id]),
+                np.array(avail_acts[p_id]),
+            )
         return idx_range
 
     def sample(self, batch_size):
@@ -74,17 +102,42 @@ class RecReplayBuffer(object):
         :return: avail_acts: (dict) maps policy_id to available actions corresponding to that policy
         """
         inds = np.random.choice(self.__len__(), batch_size)
-        obs, share_obs, acts, rewards, dones, dones_env, avail_acts = {}, {}, {}, {}, {}, {}, {}
+        obs, share_obs, acts, rewards, dones, dones_env, avail_acts = (
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+        )
         for p_id in self.policy_info.keys():
-            obs[p_id], share_obs[p_id], acts[p_id], rewards[p_id], dones[p_id], dones_env[p_id], avail_acts[p_id] = \
-            self.policy_buffers[p_id].sample_inds(inds)
+            (
+                obs[p_id],
+                share_obs[p_id],
+                acts[p_id],
+                rewards[p_id],
+                dones[p_id],
+                dones_env[p_id],
+                avail_acts[p_id],
+            ) = self.policy_buffers[p_id].sample_inds(inds)
 
         return obs, share_obs, acts, rewards, dones, dones_env, avail_acts, None, None
 
 
 class RecPolicyBuffer(object):
-    def __init__(self, buffer_size, episode_length, num_agents, obs_space, share_obs_space, act_space,
-                 use_same_share_obs, use_avail_acts, use_reward_normalization=False):
+    def __init__(
+        self,
+        buffer_size,
+        episode_length,
+        num_agents,
+        obs_space,
+        share_obs_space,
+        act_space,
+        use_same_share_obs,
+        use_avail_acts,
+        use_reward_normalization=False,
+    ):
         """
         Buffer class containing buffer data corresponding to a single policy.
 
@@ -108,42 +161,74 @@ class RecPolicyBuffer(object):
         self.current_i = 0
 
         # obs
-        if obs_space.__class__.__name__ == 'Box':
+        if obs_space.__class__.__name__ == "Box":
             obs_shape = obs_space.shape
             share_obs_shape = share_obs_space.shape
-        elif obs_space.__class__.__name__ == 'list':
+        elif obs_space.__class__.__name__ == "list":
             obs_shape = obs_space
             share_obs_shape = share_obs_space
         else:
             raise NotImplementedError
 
-        self.obs = np.zeros((self.episode_length + 1, self.buffer_size,
-                             self.num_agents, obs_shape[0]), dtype=np.float32)
+        self.obs = np.zeros(
+            (self.episode_length + 1, self.buffer_size, self.num_agents, obs_shape[0]),
+            dtype=np.float32,
+        )
 
         if self.use_same_share_obs:
-            self.share_obs = np.zeros((self.episode_length + 1, self.buffer_size, share_obs_shape[0]), dtype=np.float32)
+            self.share_obs = np.zeros(
+                (self.episode_length + 1, self.buffer_size, share_obs_shape[0]),
+                dtype=np.float32,
+            )
         else:
-            self.share_obs = np.zeros((self.episode_length + 1, self.buffer_size, self.num_agents, share_obs_shape[0]),
-                                      dtype=np.float32)
+            self.share_obs = np.zeros(
+                (
+                    self.episode_length + 1,
+                    self.buffer_size,
+                    self.num_agents,
+                    share_obs_shape[0],
+                ),
+                dtype=np.float32,
+            )
 
         # action
         act_dim = np.sum(get_dim_from_space(act_space))
-        self.acts = np.zeros((self.episode_length, self.buffer_size, self.num_agents, act_dim), dtype=np.float32)
+        self.acts = np.zeros(
+            (self.episode_length, self.buffer_size, self.num_agents, act_dim),
+            dtype=np.float32,
+        )
         if self.use_avail_acts:
-            self.avail_acts = np.ones((self.episode_length + 1, self.buffer_size, self.num_agents, act_dim),
-                                      dtype=np.float32)
+            self.avail_acts = np.ones(
+                (self.episode_length + 1, self.buffer_size, self.num_agents, act_dim),
+                dtype=np.float32,
+            )
 
         # rewards
-        self.rewards = np.zeros((self.episode_length, self.buffer_size, self.num_agents, 1), dtype=np.float32)
+        self.rewards = np.zeros(
+            (self.episode_length, self.buffer_size, self.num_agents, 1),
+            dtype=np.float32,
+        )
 
         # default to done being True
         self.dones = np.ones_like(self.rewards, dtype=np.float32)
-        self.dones_env = np.ones((self.episode_length, self.buffer_size, 1), dtype=np.float32)
+        self.dones_env = np.ones(
+            (self.episode_length, self.buffer_size, 1), dtype=np.float32
+        )
 
     def __len__(self):
         return self.filled_i
 
-    def insert(self, num_insert_episodes, obs, share_obs, acts, rewards, dones, dones_env, avail_acts=None):
+    def insert(
+        self,
+        num_insert_episodes,
+        obs,
+        share_obs,
+        acts,
+        rewards,
+        dones,
+        dones_env,
+        avail_acts=None,
+    ):
         """
         Insert a set of episodes corresponding to this policy into buffer. If the buffer size overflows, old transitions are dropped.
 
@@ -162,13 +247,18 @@ class RecPolicyBuffer(object):
 
         # obs: [step, episode, agent, dim]
         episode_length = acts.shape[0]
-        assert episode_length == self.episode_length, ("different dimension!")
+        assert episode_length == self.episode_length, "different dimension!"
 
         if self.current_i + num_insert_episodes <= self.buffer_size:
             idx_range = np.arange(self.current_i, self.current_i + num_insert_episodes)
         else:
             num_left_episodes = self.current_i + num_insert_episodes - self.buffer_size
-            idx_range = np.concatenate((np.arange(self.current_i, self.buffer_size), np.arange(num_left_episodes)))
+            idx_range = np.concatenate(
+                (
+                    np.arange(self.current_i, self.buffer_size),
+                    np.arange(num_left_episodes),
+                )
+            )
 
         if self.use_same_share_obs:
             # remove agent dimension since all agents share centralized observation
@@ -210,17 +300,20 @@ class RecPolicyBuffer(object):
             # mean std
             # [length, envs, agents, 1]
             # [length, envs, 1]
-            all_dones_env = np.tile(np.expand_dims(
-                self.dones_env[:, :self.filled_i], -1), (1, 1, self.num_agents, 1))
+            all_dones_env = np.tile(
+                np.expand_dims(self.dones_env[:, : self.filled_i], -1),
+                (1, 1, self.num_agents, 1),
+            )
             first_step_dones_env = np.zeros((1, self.filled_i, self.num_agents, 1))
-            curr_dones_env = np.concatenate((first_step_dones_env, all_dones_env[:self.episode_length - 1]))
-            temp_rewards = self.rewards[:, :self.filled_i].copy()
+            curr_dones_env = np.concatenate(
+                (first_step_dones_env, all_dones_env[: self.episode_length - 1])
+            )
+            temp_rewards = self.rewards[:, : self.filled_i].copy()
             temp_rewards[curr_dones_env == 1.0] = np.nan
 
             mean_reward = np.nanmean(temp_rewards)
             std_reward = np.nanstd(temp_rewards)
-            rewards = _cast(
-                (self.rewards[:, sample_inds] - mean_reward) / std_reward)
+            rewards = _cast((self.rewards[:, sample_inds] - mean_reward) / std_reward)
         else:
             rewards = _cast(self.rewards[:, sample_inds])
 
@@ -241,27 +334,63 @@ class RecPolicyBuffer(object):
 
 
 class PrioritizedRecReplayBuffer(RecReplayBuffer):
-    def __init__(self, alpha, policy_info, policy_agents, buffer_size, episode_length, use_same_share_obs,
-                 use_avail_acts, use_reward_normalization=False):
+    def __init__(
+        self,
+        alpha,
+        policy_info,
+        policy_agents,
+        buffer_size,
+        episode_length,
+        use_same_share_obs,
+        use_avail_acts,
+        use_reward_normalization=False,
+    ):
         """Prioritized replay buffer class for training RNN policies. See parent class."""
-        super(PrioritizedRecReplayBuffer, self).__init__(policy_info, policy_agents, buffer_size,
-                                                         episode_length, use_same_share_obs, use_avail_acts,
-                                                         use_reward_normalization)
+        super(PrioritizedRecReplayBuffer, self).__init__(
+            policy_info,
+            policy_agents,
+            buffer_size,
+            episode_length,
+            use_same_share_obs,
+            use_avail_acts,
+            use_reward_normalization,
+        )
         self.alpha = alpha
         self.policy_info = policy_info
         it_capacity = 1
         while it_capacity < buffer_size:
             it_capacity *= 2
 
-        self._it_sums = {p_id: SumSegmentTree(
-            it_capacity) for p_id in self.policy_info.keys()}
-        self._it_mins = {p_id: MinSegmentTree(
-            it_capacity) for p_id in self.policy_info.keys()}
+        self._it_sums = {
+            p_id: SumSegmentTree(it_capacity) for p_id in self.policy_info.keys()
+        }
+        self._it_mins = {
+            p_id: MinSegmentTree(it_capacity) for p_id in self.policy_info.keys()
+        }
         self.max_priorities = {p_id: 1.0 for p_id in self.policy_info.keys()}
 
-    def insert(self, num_insert_episodes, obs, share_obs, acts, rewards, dones, dones_env, avail_acts=None):
+    def insert(
+        self,
+        num_insert_episodes,
+        obs,
+        share_obs,
+        acts,
+        rewards,
+        dones,
+        dones_env,
+        avail_acts=None,
+    ):
         """See parent class."""
-        idx_range = super().insert(num_insert_episodes, obs, share_obs, acts, rewards, dones, dones_env, avail_acts)
+        idx_range = super().insert(
+            num_insert_episodes,
+            obs,
+            share_obs,
+            acts,
+            rewards,
+            dones,
+            dones_env,
+            avail_acts,
+        )
         for idx in range(idx_range[0], idx_range[1]):
             for p_id in self.policy_info.keys():
                 self._it_sums[p_id][idx] = self.max_priorities[p_id] ** self.alpha
@@ -284,8 +413,9 @@ class PrioritizedRecReplayBuffer(RecReplayBuffer):
 
         :return: See parent class.
         """
-        assert len(
-            self) > batch_size, "Cannot sample with no completed episodes in the buffer!"
+        assert (
+            len(self) > batch_size
+        ), "Cannot sample with no completed episodes in the buffer!"
         assert beta > 0
 
         batch_inds = self._sample_proportional(batch_size, p_id)
@@ -295,13 +425,38 @@ class PrioritizedRecReplayBuffer(RecReplayBuffer):
         p_sample = self._it_sums[p_id][batch_inds] / self._it_sums[p_id].sum()
         weights = (p_sample * len(self)) ** (-beta) / max_weight
 
-        obs, share_obs, acts, rewards, dones, dones_env, avail_acts = {}, {}, {}, {}, {}, {}, {}
+        obs, share_obs, acts, rewards, dones, dones_env, avail_acts = (
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+        )
         for p_id in self.policy_info.keys():
             p_buffer = self.policy_buffers[p_id]
-            obs[p_id], share_obs[p_id], acts[p_id], rewards[p_id], dones[p_id], dones_env[p_id], avail_acts[
-                p_id] = p_buffer.sample_inds(batch_inds)
+            (
+                obs[p_id],
+                share_obs[p_id],
+                acts[p_id],
+                rewards[p_id],
+                dones[p_id],
+                dones_env[p_id],
+                avail_acts[p_id],
+            ) = p_buffer.sample_inds(batch_inds)
 
-        return obs, share_obs, acts, rewards, dones, dones_env, avail_acts, weights, batch_inds
+        return (
+            obs,
+            share_obs,
+            acts,
+            rewards,
+            dones,
+            dones_env,
+            avail_acts,
+            weights,
+            batch_inds,
+        )
 
     def update_priorities(self, idxes, priorities, p_id=None):
         """
@@ -317,8 +472,7 @@ class PrioritizedRecReplayBuffer(RecReplayBuffer):
         assert np.min(idxes) >= 0
         assert np.max(idxes) < len(self)
 
-        self._it_sums[p_id][idxes] = priorities ** self.alpha
-        self._it_mins[p_id][idxes] = priorities ** self.alpha
+        self._it_sums[p_id][idxes] = priorities**self.alpha
+        self._it_mins[p_id][idxes] = priorities**self.alpha
 
-        self.max_priorities[p_id] = max(
-            self.max_priorities[p_id], np.max(priorities))
+        self.max_priorities[p_id] = max(self.max_priorities[p_id], np.max(priorities))

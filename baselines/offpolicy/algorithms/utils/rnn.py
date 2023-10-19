@@ -1,15 +1,16 @@
 import torch.nn as nn
 from .mlp import MLPBase
 
+
 class RNNLayer(nn.Module):
     def __init__(self, inputs_dim, outputs_dim, recurrent_N, use_orthogonal):
         super(RNNLayer, self).__init__()
 
         self.rnn = nn.GRU(inputs_dim, outputs_dim, num_layers=recurrent_N)
         for name, param in self.rnn.named_parameters():
-            if 'bias' in name:
+            if "bias" in name:
                 nn.init.constant_(param, 0)
-            elif 'weight' in name:
+            elif "weight" in name:
                 if use_orthogonal:
                     nn.init.orthogonal_(param)
                 else:
@@ -22,13 +23,16 @@ class RNNLayer(nn.Module):
         x = self.norm(x)
         return x, hxs[0, :, :]
 
+
 class RNNBase(MLPBase):
     def __init__(self, args, inputs_dim):
         super(RNNBase, self).__init__(args, inputs_dim)
 
         self._recurrent_N = args.recurrent_N
 
-        self.rnn = RNNLayer(self.hidden_size, self.hidden_size, self._recurrent_N, self._use_orthogonal)
+        self.rnn = RNNLayer(
+            self.hidden_size, self.hidden_size, self._recurrent_N, self._use_orthogonal
+        )
 
     def forward(self, x, hxs):
         if self._use_feature_normalization:
@@ -42,6 +46,6 @@ class RNNBase(MLPBase):
 
         x = self.mlp(x)
 
-        x, hxs = self.rnn(x,hxs)
+        x, hxs = self.rnn(x, hxs)
 
         return x, hxs

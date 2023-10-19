@@ -16,11 +16,12 @@ communication actions in this array. See environment.py for more details.
 
 from multiagent.custom_scenarios import load
 from multiagent.environment import MultiAgentOffPolicyEnv as MultiAgentEnv
+
 # from multiagent.environment import MultiAgentPPOEnv as MultiAgentEnv
 
 
 def MPEEnv(args):
-    '''
+    """
     Creates a MultiAgentEnv object as env. This can be used similar to a gym
     environment by calling env.reset() and env.step().
     Use env.render() to view the environment on the screen.
@@ -35,22 +36,28 @@ def MPEEnv(args):
         .observation_space  :   Returns the observation space for each agent
         .action_space       :   Returns the action space for each agent
         .n                  :   Returns the number of Agents
-    '''
+    """
 
     # load scenario from script
     scenario = load(args.scenario_name + ".py").Scenario()
     # create world
     world = scenario.make_world(args)
     # create multiagent environment
-    if 'navigation' in args.scenario_name:
-        env = MultiAgentEnv(world=world, reset_callback=scenario.reset_world,
-                            reward_callback=scenario.reward,
-                            observation_callback=scenario.observation,
-                            info_callback=scenario.info_callback)
+    if "navigation" in args.scenario_name:
+        env = MultiAgentEnv(
+            world=world,
+            reset_callback=scenario.reset_world,
+            reward_callback=scenario.reward,
+            observation_callback=scenario.observation,
+            info_callback=scenario.info_callback,
+        )
     else:
-        env = MultiAgentEnv(world=world, reset_callback=scenario.reset_world,
-                            reward_callback=scenario.reward,
-                            observation_callback=scenario.observation)
+        env = MultiAgentEnv(
+            world=world,
+            reset_callback=scenario.reset_world,
+            reward_callback=scenario.reward,
+            observation_callback=scenario.observation,
+        )
     # env = MultiAgentEnv(world, scenario.reset_world,scenario.reward, scenario.observation)
 
     return env

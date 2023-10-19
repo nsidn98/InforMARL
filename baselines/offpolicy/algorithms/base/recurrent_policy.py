@@ -3,8 +3,11 @@ from abc import ABC, abstractmethod
 
 class RecurrentPolicy(ABC):
     """Abstract recurrent policy class. Computes actions given relevant information."""
+
     @abstractmethod
-    def get_actions(self, obs, prev_actions, rnn_states, available_actions, t_env, explore):
+    def get_actions(
+        self, obs, prev_actions, rnn_states, available_actions, t_env, explore
+    ):
         """
         Compute actions using the needed information.
         :param obs: (np.ndarray) Observations with which to compute actions.

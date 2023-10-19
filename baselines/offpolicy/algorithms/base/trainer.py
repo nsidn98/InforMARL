@@ -2,9 +2,10 @@ from abc import ABC, abstractmethod
 
 
 class Trainer(ABC):
-
     @abstractmethod
-    def __init__(self, args, num_agents, policies, policy_mapping_fn, device, episode_length):
+    def __init__(
+        self, args, num_agents, policies, policy_mapping_fn, device, episode_length
+    ):
         """
         Abstract trainer class. Performs gradient updates to policies.
         :param args: (Namespace) contains parameters needed to perform training updates.
