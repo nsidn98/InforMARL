@@ -90,7 +90,7 @@ class Categorical(nn.Module):
         x = self.linear(x)
         # supress the logits at all non-available actions
         if available_actions is not None:
-            x[available_actions == 0] = -1e10
+            x[available_actions == 0] = torch.finfo(x.dtype).min
         return FixedCategorical(logits=x)
 
 
