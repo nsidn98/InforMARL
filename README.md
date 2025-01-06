@@ -9,6 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![License: MIT](https://img.shields.io/badge/arXiv-2211.02127-green)](http://arxiv.org/abs/2211.02127)
 [![License: MIT](https://img.shields.io/badge/Project-Website-blue)](https://nsidn98.github.io/InforMARL/)
+[![License: MIT](https://img.shields.io/badge/JAX-Implementation-orange)](https://github.com/jselvaraaj/JaxInforMARL)
 
 </div>
 
@@ -19,6 +20,7 @@ A graph neural network framework for multi-agent reinforcement learning with lim
 
 [Siddharth Nayak](http://nsidn98.github.io/), [Kenneth Choi](https://www.linkedin.com/in/kennethschoi/), [Wenqi Ding](https://github.com/dingwq22), [Sydney Dolan](https://sydneyidolan.com/), [Karthik Gopalakrishnan](https://karthikg.mit.edu/about-me), [Hamsa Balakrishnan](http://www.mit.edu/~hamsa/)
 
+Jan 2025 - A [JAX](https://jax.readthedocs.io/en/latest/quickstart.html) implementation of InforMARL is now available [here](https://github.com/jselvaraaj/JaxInforMARL). Shoutout to [@jselvaraaj](https://github.com/jselvaraaj) for implementing it along with a [Jupyter notebook](https://github.com/jselvaraaj/JaxInforMARL/blob/main/train_with_gpu.ipynb). Now you can train InforMARL within 5 minutes!!!
 
 April 2023 - The paper was accepted to ICML'2023! See you in Honolulu in July 2023
 
