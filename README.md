@@ -20,9 +20,12 @@ A graph neural network framework for multi-agent reinforcement learning with lim
 
 [Siddharth Nayak](http://nsidn98.github.io/), [Kenneth Choi](https://www.linkedin.com/in/kennethschoi/), [Wenqi Ding](https://github.com/dingwq22), [Sydney Dolan](https://sydneyidolan.com/), [Karthik Gopalakrishnan](https://karthikg.mit.edu/about-me), [Hamsa Balakrishnan](http://www.mit.edu/~hamsa/)
 
+## News: 
+Jul 2025 - InforMARL is now available on [Mava](https://github.com/instadeepai/Mava/blob/17ee9968107cbf777b6e1d39ef95152883bb473d/mava/networks/gnn.py#L37) - A distributed MARL in JAX.
+
 Jan 2025 - A [JAX](https://jax.readthedocs.io/en/latest/quickstart.html) implementation of InforMARL is now available [here](https://github.com/jselvaraaj/JaxInforMARL). Shoutout to [@jselvaraaj](https://github.com/jselvaraaj) for implementing it along with a [Jupyter notebook](https://github.com/jselvaraaj/JaxInforMARL/blob/main/train_with_gpu.ipynb). Now you can train InforMARL within 5 minutes!!!
 
-April 2023 - The paper was accepted to ICML'2023! See you in Honolulu in July 2023
+Apr 2023 - The paper was accepted to ICML'2023! See you in Honolulu in July 2023
 
 Dec 2022 - Presented a short version of this paper at the [Strategic Multi-Agent Interactions: Game Theory for Robot Learning and Decision Making Workshop](https://sites.google.com/view/corl-2022-games-workshop/) at [CoRL](https://corl2022.org/) in Auckland. You can find the recording [here](https://youtu.be/8Ig2LYGvRuk?t=9617).
 
